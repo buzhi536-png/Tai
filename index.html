@@ -27,7 +27,7 @@
             background: #faf7f2;
             position: relative;
         }
-        /* 全局顶部励志语 */
+        /* 全局顶部励志语 - 永远常驻 */
         .global-banner {
             flex-shrink: 0;
             background: #e6d5b8;
@@ -42,11 +42,12 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-        /* 普通模式（非沉浸）头部 */
-        .normal-header {
+        /* 全局头部导航栏 - 永远常驻，拒绝死胡同 */
+        .global-header {
             flex-shrink: 0;
             padding: 12px 16px 8px;
             background: #faf7f2;
+            border-bottom: 1px solid #f0eae2;
         }
         .search-bar {
             display: flex;
@@ -72,6 +73,7 @@
             border-radius: 30px;
             font-size: 0.8rem;
             cursor: pointer;
+            color: #4a3727;
         }
         .tabs {
             display: flex;
@@ -98,9 +100,18 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
             font-weight: 600;
         }
-        /* 普通模式下的内容区域（列表模式） */
-        .list-mode {
+
+        /* 核心切换舞台容器 */
+        .stage-container {
             flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 模式一：普通列表视窗（收藏、搜索、功课共用） */
+        .list-view-window {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             overflow-y: auto;
             padding: 16px;
             display: flex;
@@ -108,25 +119,27 @@
             gap: 18px;
             -webkit-overflow-scrolling: touch;
         }
-        .list-mode .card {
+        .list-view-window .card {
             background: white;
             border-radius: 28px;
             padding: 20px;
             position: relative;
             border: 1px solid #ece1d4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .list-mode .question {
+        .list-view-window .question {
             font-size: 1.2rem;
             font-weight: 700;
             padding-right: 48px;
             margin-bottom: 12px;
+            color: #3e2a1f;
         }
-        .list-mode .answer {
+        .list-view-window .answer {
             font-size: 0.95rem;
             line-height: 1.5;
             color: #5a4a3a;
         }
-        .list-mode .fav-btn {
+        .list-view-window .fav-btn {
             position: absolute;
             top: 16px;
             right: 16px;
@@ -134,87 +147,46 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #d4c0a8;
         }
-        .list-mode .fav-btn.active { color: #e67e22; }
-        /* 沉浸模式容器（全屏滑动卡片） */
-        .immersive-container {
-            flex: 1;
+
+        /* 模式二：沉浸式简讯滑屏视窗 */
+        .immersive-view-window {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
-            background: #faf7f2;
-            position: relative;
-        }
-        .immersive-header {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: transparent;
-            z-index: 10;
-        }
-        .back-home-btn {
-            background: rgba(0,0,0,0.05);
-            border: none;
-            border-radius: 30px;
-            padding: 6px 14px;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            color: #5a4a3a;
-            backdrop-filter: blur(4px);
-        }
-        .back-home-btn:active {
-            background: rgba(0,0,0,0.1);
-        }
-        .immersive-banner {
-            background: rgba(230,213,184,0.9);
-            backdrop-filter: blur(4px);
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #4a3727;
-        }
-        .card-swipe-area {
-            flex: 1;
-            position: relative;
-            touch-action: none;
-            overflow: hidden;
-        }
-        .swipe-card {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.3s ease;
-            will-change: transform, opacity;
         }
-        .card-inner {
+        .swipe-card-box {
+            width: 100%;
+            max-height: 75%;
             background: white;
             border-radius: 36px;
             padding: 32px 28px;
-            width: 100%;
-            max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1);
             border: 1px solid #ece1d4;
             position: relative;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            will-change: transform, opacity;
+        }
+        .swipe-card-box.animating-out {
+            transition: transform 0.25s ease, opacity 0.2s ease;
+            transform: translateY(-40px);
+            opacity: 0;
+        }
+        .swipe-card-box.animating-in {
+            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.25s ease;
+            transform: translateY(0);
+            opacity: 1;
         }
         .card-question {
-            font-size: 1.7rem;
+            font-size: 1.6rem;
             font-weight: 700;
             line-height: 1.4;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             color: #3e2a1f;
             padding-right: 48px;
         }
@@ -239,115 +211,93 @@
             border: none;
             font-size: 1.9rem;
             cursor: pointer;
-            color: #d4c0a8;
-            transition: transform 0.2s;
-            z-index: 2;
+            transition: transform 0.15s;
         }
-        .swipe-fav-btn.active { color: #e67e22; }
-        .swipe-hint {
-            flex-shrink: 0;
+
+        /* 紧贴卡片下方的新手引导提示字（彻底解决掉到底部的Bug） */
+        .hint-text-under-card {
+            margin-top: 20px;
             text-align: center;
-            padding: 12px 0 20px;
             color: #bcae9a;
             font-size: 12px;
             cursor: pointer;
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            transition: background 0.2s;
         }
+        .hint-text-under-card:active {
+            background: rgba(0,0,0,0.06);
+        }
+
+        /* 工具统一样式 */
         .hidden { display: none !important; }
-        /* 功课样式 */
         .journal-area {
             background: white;
             border-radius: 28px;
             padding: 20px;
             margin-bottom: 20px;
+            border: 1px solid #ece1d4;
         }
-        .journal-date {
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #b45f2b;
-        }
+        .journal-date { font-weight: 700; margin-bottom: 12px; color: #b45f2b; }
         .journal-input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e6d9ce;
-            border-radius: 24px;
-            font-family: inherit;
-            margin-bottom: 10px;
+            width: 100%; padding: 12px; border: 1px solid #e6d9ce;
+            border-radius: 24px; font-family: inherit; margin-bottom: 10px; outline: none;
         }
         .journal-save {
-            background: #e0d6cc;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 30px;
-            cursor: pointer;
+            background: #e0d6cc; border: none; padding: 6px 16px;
+            border-radius: 30px; cursor: pointer; color: #4a3727; font-weight: 600;
         }
-        .history-item {
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px dashed #eee3d8;
-        }
-        .history-date {
-            font-size: 0.7rem;
-            color: #a2856a;
-        }
-        .history-text {
-            font-size: 0.85rem;
-            margin-top: 4px;
-        }
-        .status-message {
-            text-align: center;
-            padding: 12px;
-            color: #b8a88a;
-            font-size: 0.75rem;
-        }
-        footer {
-            text-align: center;
-            font-size: 0.6rem;
-            color: #cbbc9f;
-            padding: 10px;
-        }
+        .history-item { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed #eee3d8; }
+        .history-date { font-size: 0.7rem; color: #a2856a; display: flex; justify-content: space-between; }
+        .edit-history { background: none; border: none; color: #b45f2b; cursor: pointer; }
+        .history-text { font-size: 0.85rem; margin-top: 4px; color: #5a4a3a; }
+        .status-message { text-align: center; padding: 12px; color: #b8a88a; font-size: 0.75rem; }
+        footer { text-align: center; font-size: 0.6rem; color: #cbbc9f; padding: 15px; margin-top: auto; }
     </style>
 </head>
 <body>
 <div class="app">
-    <!-- 全局励志语（始终显示） -->
-    <div class="global-banner" id="globalWisdom">⚡ 加载中...</div>
+    <!-- 1. 全局最顶端励志语栏 -->
+    <div class="global-banner" id="globalWisdom">⚡ 正在接入净土数据...</div>
 
-    <!-- 普通模式（包含搜索、Tab、列表内容） -->
-    <div id="normalMode" class="normal-mode" style="display: flex; flex-direction: column; height: 100%;">
-        <div class="normal-header">
-            <div class="search-bar">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索佛经讲解... 如：放下、因果">
-                <button id="searchBtn" class="search-btn">搜索</button>
-                <button id="clearSearchBtn" class="clear-search" style="display: none;">返回</button>
-            </div>
-            <div class="tabs">
-                <div class="tab active" data-mode="random">📖 随机推送</div>
-                <div class="tab" data-mode="favorites">⭐ 我的收藏</div>
-                <div class="tab" data-mode="journal">📝 修行功课</div>
-            </div>
+    <!-- 2. 全局常驻操作头栏 -->
+    <div class="global-header">
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索佛经讲解... 如：放下、因果">
+            <button id="searchBtn" class="search-btn">搜索</button>
+            <button id="clearSearchBtn" class="clear-search" style="display: none;">主页</button>
         </div>
-        <div id="listModeContainer" class="list-mode">
+        <div class="tabs">
+            <div class="tab active" data-mode="random">📖 随机推送</div>
+            <div class="tab" data-mode="favorites">⭐ 我的收藏</div>
+            <div class="tab" data-mode="journal">📝 修行功课</div>
+        </div>
+    </div>
+
+    <!-- 3. 核心切换舞台（两个视窗独立并存，绝不打架） -->
+    <div class="stage-container">
+        <!-- 视窗A：简讯单卡沉浸流 -->
+        <div id="immersiveView" class="immersive-view-window">
+            <div id="swipeCardBox" class="swipe-card-box">
+                <!-- 由JS注入卡片内部 -->
+            </div>
+            <!-- 紧贴在卡片下方的多功能备用引导字 -->
+            <div id="hintText" class="hint-text-under-card">⬆️ 往上滑动 或 点击此处 查看下一条</div>
+        </div>
+
+        <!-- 视窗B：常规列表流 -->
+        <div id="listView" class="list-view-window hidden">
             <div id="cardsContainer"></div>
             <div id="statusMessage" class="status-message"></div>
             <footer>🙏 精进不懈 · 随喜赞叹</footer>
         </div>
     </div>
-
-    <!-- 沉浸模式（全屏滑动卡片，带返回按钮） -->
-    <div id="immersiveMode" class="immersive-container hidden">
-        <div class="immersive-header">
-            <button id="backHomeBtn" class="back-home-btn">← 返回主页</button>
-            <div class="immersive-banner" id="immersiveWisdom"></div>
-        </div>
-        <div id="immersiveSwipeArea" class="card-swipe-area">
-            <div id="cardSwipeContainer" class="card-swipe-container"></div>
-        </div>
-        <div id="immersiveHint" class="swipe-hint">⬆️ 往上滑动 或 点击此处 查看下一条</div>
-    </div>
 </div>
 
 <script>
-    // ---------- 1. 问答数据 ----------
+    // ---------- 核心假数据源 ----------
     const sampleQA = [
         { id: "1", question: "什么是“色即是空”？", answer: "色指物质现象，空指无自性。一切物质都是因缘和合而生，没有永恒不变的实体。", source: "心经讲解" },
         { id: "2", question: "如何理解“放下”？", answer: "放下不是放弃，而是不执着。该做的事仍然做，但心里不挂碍结果。", source: "金刚经浅释" },
@@ -356,16 +306,15 @@
         { id: "5", question: "什么是“无我”？", answer: "没有一个独立、恒常的“我”，身心五蕴刹那生灭。", source: "阿含经" }
     ];
     let fullKnowledge = [...sampleQA];
-    for (let i = 6; i <= 30; i++) {
+    for (let i = 6; i <= 35; i++) {
         fullKnowledge.push({
             id: String(i),
             question: `佛学问答 ${i}：如何保持正念？`,
-            answer: `正念就是活在当下，觉知身心现象。可以从呼吸开始练习。第${i}条示例内容。`,
+            answer: `正念就是活在当下，觉知身心现象。可以从呼吸开始练习。专注于每一个呼吸的起伏。`,
             source: "正念禅修"
         });
     }
 
-    // 励志语库
     const wisdomQuotes = [
         "⏳ 是日已过，命亦随减，如少水鱼，斯有何乐？",
         "🔥 大众当勤精进，如救头燃，但念无常，慎勿放逸。",
@@ -373,435 +322,287 @@
         "🧘 暇满人身难得，正法难遇，此刻不修，更待何时？",
         "⚡ 生死事大，无常迅速，各自努力，莫再蹉跎。"
     ];
-    function setRandomWisdom() {
-        const wisdom = wisdomQuotes[Math.floor(Math.random() * wisdomQuotes.length)];
-        document.getElementById("globalWisdom").innerText = wisdom;
-        document.getElementById("immersiveWisdom").innerText = wisdom;
-    }
 
-    // ---------- 2. 全局状态 ----------
+    // 全局驱动状态
     let favoriteIds = new Set();
     let journalEntries = [];
-    let currentNormalMode = "random";   // random, favorites, search, journal
+    let currentAppMode = "random"; // random, favorites, journal, search
     let searchResults = [];
-
-    // 沉浸模式随机队列
     let randomQueue = [];
-    let currentCardIndex = 0;
-    let isAnimating = false;
+    let currentQueueIndex = 0;
+    let isPageAnimating = false;
 
-    // DOM 元素
-    const normalModeDiv = document.getElementById("normalMode");
-    const immersiveModeDiv = document.getElementById("immersiveMode");
+    // DOM 锚点
+    const immersiveView = document.getElementById("immersiveView");
+    const listView = document.getElementById("listView");
+    const swipeCardBox = document.getElementById("swipeCardBox");
     const cardsContainer = document.getElementById("cardsContainer");
-    const statusMsgDiv = document.getElementById("statusMessage");
-    const swipeContainer = document.getElementById("cardSwipeContainer");
-    const immersiveHint = document.getElementById("immersiveHint");
-    const backHomeBtn = document.getElementById("backHomeBtn");
+    const statusMessage = document.getElementById("statusMessage");
+    const hintText = document.getElementById("hintText");
 
-    // ---------- 3. 收藏功能 ----------
-    function loadFavorites() {
-        const stored = localStorage.getItem("buddha_favorites");
-        if (stored) try { favoriteIds = new Set(JSON.parse(stored)); } catch(e) {}
+    // ---------- 数据存储核心 ----------
+    function loadStorage() {
+        const favs = localStorage.getItem("buddha_favorites");
+        if (favs) try { favoriteIds = new Set(JSON.parse(favs)); } catch(e){}
+        const jor = localStorage.getItem("buddha_journal");
+        if (jor) try { journalEntries = JSON.parse(jor); } catch(e){}
     }
-    function saveFavorites() {
-        localStorage.setItem("buddha_favorites", JSON.stringify([...favoriteIds]));
+    function saveFavs() { localStorage.setItem("buddha_favorites", JSON.stringify([...favoriteIds])); }
+    function isFav(id) { return favoriteIds.has(id); }
+    function toggleFav(id) {
+        isFav(id) ? favoriteIds.delete(id) : favoriteIds.add(id);
+        saveFavs();
     }
-    function isFavorite(id) { return favoriteIds.has(id); }
-    function addFavorite(id) {
-        favoriteIds.add(id);
-        saveFavorites();
-        refreshNormalView();
-        if (!normalModeDiv.classList.contains("hidden")) {
-            // 如果当前在普通模式且显示收藏列表，需要刷新
-            if (currentNormalMode === "favorites") renderFavorites();
-            else if (currentNormalMode === "random") renderRandomList(); // 刷新随机列表的收藏图标
+
+    function changeBannerWisdom() {
+        document.getElementById("globalWisdom").innerText = wisdomQuotes[Math.floor(Math.random() * wisdomQuotes.length)];
+    }
+
+    // ---------- 沉浸式单卡核心渲染与手势 ----------
+    function initRandomQueue() {
+        randomQueue = [...fullKnowledge].sort(() => Math.random() - 0.5);
+        currentQueueIndex = 0;
+    }
+
+    function renderImmersiveCard() {
+        if (randomQueue.length === 0) initRandomQueue();
+        if (currentQueueIndex >= randomQueue.length) {
+            initRandomQueue();
         }
-    }
-    function removeFavorite(id) {
-        favoriteIds.delete(id);
-        saveFavorites();
-        refreshNormalView();
-        if (!normalModeDiv.classList.contains("hidden")) {
-            if (currentNormalMode === "favorites") renderFavorites();
-            else if (currentNormalMode === "random") renderRandomList();
-        }
-    }
-    function toggleFavorite(id) {
-        isFavorite(id) ? removeFavorite(id) : addFavorite(id);
-    }
+        const item = randomQueue[currentQueueIndex];
+        if (!item) return;
 
-    // 刷新沉浸模式下的当前卡片收藏按钮
-    function refreshImmersiveFavButton(cardId) {
-        const btn = document.querySelector(".swipe-fav-btn");
-        if (btn && btn.getAttribute("data-id") === cardId) {
-            if (isFavorite(cardId)) {
-                btn.classList.add("active");
-                btn.innerText = "❤️";
-            } else {
-                btn.classList.remove("active");
-                btn.innerText = "🤍";
-            }
-        }
-    }
-
-    // ---------- 4. 普通模式：随机推送列表（非沉浸，传统卡片列表）----------
-    function renderRandomList() {
-        // 显示所有卡片的前20条（或全部），简化，展示全部
-        renderCards(fullKnowledge);
-        statusMsgDiv.innerHTML = "📖 共有 " + fullKnowledge.length + " 条智慧问答，点击上方随机推送进入沉浸滑动模式";
-    }
-
-    function renderCards(cards) {
-        cardsContainer.innerHTML = "";
-        if (!cards || cards.length === 0) {
-            cardsContainer.innerHTML = "<div style='text-align:center; padding:40px;'>暂无内容</div>";
-            return;
-        }
-        cards.forEach(card => {
-            const div = document.createElement("div");
-            div.className = "card";
-            div.innerHTML = `
-                <div class="question">❓ ${escapeHtml(card.question)}</div>
-                <div class="answer">📝 ${escapeHtml(card.answer)}</div>
-                <div class="source" style="font-size:0.7rem; margin-top:8px;">📌 ${escapeHtml(card.source || "佛经讲解")}</div>
-                <button class="fav-btn ${isFavorite(card.id) ? 'active' : ''}" data-id="${card.id}">${isFavorite(card.id) ? "❤️" : "🤍"}</button>
-            `;
-            div.querySelector(".fav-btn").addEventListener("click", (e) => {
-                e.stopPropagation();
-                toggleFavorite(card.id);
-                renderCards(cards); // 刷新列表
-            });
-            cardsContainer.appendChild(div);
-        });
-    }
-
-    function renderFavorites() {
-        const favCards = fullKnowledge.filter(c => isFavorite(c.id));
-        renderCards(favCards);
-        statusMsgDiv.innerHTML = favCards.length ? `⭐ 共 ${favCards.length} 条收藏` : "暂无收藏";
-    }
-
-    // 搜索
-    function performSearch() {
-        const keyword = document.getElementById("searchInput").value.trim();
-        if (!keyword) { alert("请输入关键词"); return; }
-        const lower = keyword.toLowerCase();
-        const results = fullKnowledge.filter(c => 
-            c.question.toLowerCase().includes(lower) || c.answer.toLowerCase().includes(lower)
-        );
-        searchResults = results;
-        currentNormalMode = "search";
-        renderCards(searchResults);
-        statusMsgDiv.innerHTML = `🔍 找到 ${results.length} 条结果`;
-        document.getElementById("clearSearchBtn").style.display = "inline-block";
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    }
-    function exitSearch() {
-        currentNormalMode = "random";
-        document.getElementById("searchInput").value = "";
-        document.getElementById("clearSearchBtn").style.display = "none";
-        document.querySelector(".tab[data-mode='random']").classList.add("active");
-        renderRandomList();
-    }
-
-    // 功课
-    function loadJournal() {
-        const stored = localStorage.getItem("buddha_journal");
-        if (stored) try { journalEntries = JSON.parse(stored); } catch(e) {}
-        else journalEntries = [];
-    }
-    function saveJournal() { localStorage.setItem("buddha_journal", JSON.stringify(journalEntries)); }
-    function getTodayDate() { return new Date().toISOString().slice(0,10); }
-    function getTodayEntry() { return journalEntries.find(e => e.date === getTodayDate()); }
-    function saveTodayEntry(text) {
-        const today = getTodayDate();
-        const idx = journalEntries.findIndex(e => e.date === today);
-        if (idx >= 0) journalEntries[idx].text = text;
-        else journalEntries.unshift({ date: today, text: text });
-        saveJournal();
-        renderJournalMode();
-    }
-    function updateJournalEntry(date, newText) {
-        const idx = journalEntries.findIndex(e => e.date === date);
-        if (idx >= 0) journalEntries[idx].text = newText;
-        saveJournal();
-        renderJournalMode();
-    }
-    function renderJournalMode() {
-        cardsContainer.innerHTML = "";
-        const today = getTodayDate();
-        const todayEntry = getTodayEntry();
-        const journalHTML = `
-            <div class="journal-area">
-                <div class="journal-date">📅 今日 · ${today}</div>
-                <textarea id="journalText" class="journal-input" rows="3" placeholder="记录今日修行功课..."></textarea>
-                <button id="saveJournalBtn" class="journal-save">保存今日记录</button>
-            </div>
-            <div class="journal-area">
-                <div class="journal-date">📖 过往记录</div>
-                <div id="historyList"></div>
-            </div>
+        swipeCardBox.innerHTML = `
+            <div class="card-question">❓ ${item.question}</div>
+            <div class="card-answer">📝 ${item.answer}</div>
+            <div class="card-source">📌 ${item.source}</div>
+            <button class="swipe-fav-btn" id="swipeFavBtn">${isFav(item.id) ? "❤️" : "🤍"}</button>
         `;
-        cardsContainer.innerHTML = journalHTML;
-        const textarea = document.getElementById("journalText");
-        if (todayEntry) textarea.value = todayEntry.text;
-        document.getElementById("saveJournalBtn").addEventListener("click", () => saveTodayEntry(textarea.value));
-        const historyList = document.getElementById("historyList");
-        const pastEntries = journalEntries.filter(e => e.date !== today).sort((a,b) => new Date(b.date) - new Date(a.date));
-        if (!pastEntries.length) historyList.innerHTML = "<div style='color:#b8a88a; padding:8px;'>暂无历史记录</div>";
-        else {
-            pastEntries.forEach(entry => {
-                const item = document.createElement("div");
-                item.className = "history-item";
-                item.innerHTML = `
-                    <div class="history-date">${entry.date} <button class="edit-history" data-date="${entry.date}">编辑</button></div>
-                    <div class="history-text">${escapeHtml(entry.text)}</div>
-                `;
-                item.querySelector(".edit-history").addEventListener("click", () => {
-                    const newText = prompt("编辑修行记录", entry.text);
-                    if (newText !== null) updateJournalEntry(entry.date, newText);
-                });
-                historyList.appendChild(item);
-            });
-        }
-        statusMsgDiv.innerHTML = "";
+
+        // 单击收藏按钮
+        document.getElementById("swipeFavBtn").onclick = (e) => {
+            e.stopPropagation();
+            toggleFav(item.id);
+            document.getElementById("swipeFavBtn").innerText = isFav(item.id) ? "❤️" : "🤍";
+        };
+
+        // 双击卡片快速收藏
+        swipeCardBox.ondblclick = (e) => {
+            e.stopPropagation();
+            toggleFav(item.id);
+            const btn = document.getElementById("swipeFavBtn");
+            btn.innerText = isFav(item.id) ? "❤️" : "🤍";
+            btn.style.transform = "scale(1.4)";
+            setTimeout(() => btn.style.transform = "scale(1)", 150);
+        };
     }
 
-    function refreshNormalView() {
-        if (currentNormalMode === "random") renderRandomList();
-        else if (currentNormalMode === "favorites") renderFavorites();
-        else if (currentNormalMode === "search") renderCards(searchResults);
-        else if (currentNormalMode === "journal") renderJournalMode();
-    }
+    function triggerNextImmersiveCard() {
+        if (isPageAnimating) return;
+        isPageAnimating = true;
 
-    // 处理普通模式Tab切换
-    function handleNormalTabClick(mode) {
-        currentNormalMode = mode;
-        if (mode === "random") {
-            renderRandomList();
-        } else if (mode === "favorites") {
-            renderFavorites();
-        } else if (mode === "journal") {
-            renderJournalMode();
-        }
-        document.querySelectorAll(".tab").forEach(tab => {
-            if (tab.getAttribute("data-mode") === mode) tab.classList.add("active");
-            else tab.classList.remove("active");
-        });
-        document.getElementById("clearSearchBtn").style.display = "none";
-        document.getElementById("searchInput").value = "";
-    }
-
-    // ---------- 5. 沉浸模式逻辑 ----------
-    function rebuildRandomQueue() {
-        const shuffled = [...fullKnowledge];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        randomQueue = shuffled;
-        currentCardIndex = 0;
-    }
-    function ensureQueueValid() {
-        if (randomQueue.length === 0) rebuildRandomQueue();
-        if (currentCardIndex >= randomQueue.length) {
-            rebuildRandomQueue();
-            showImmersiveToast("✨ 已看完一轮，开始新的一轮 ✨");
-        }
-    }
-    function getCurrentCard() {
-        ensureQueueValid();
-        return randomQueue[currentCardIndex] || null;
-    }
-    function renderCurrentSwipeCard() {
-        const card = getCurrentCard();
-        if (!card) {
-            swipeContainer.innerHTML = `<div style="text-align:center; padding:40px;">暂无数据</div>`;
-            return;
-        }
-        const isFav = isFavorite(card.id);
-        swipeContainer.innerHTML = `
-            <div class="swipe-card" style="transform: translateY(0); opacity: 1;">
-                <div class="card-inner">
-                    <div class="card-question">❓ ${escapeHtml(card.question)}</div>
-                    <div class="card-answer">📝 ${escapeHtml(card.answer)}</div>
-                    <div class="card-source">📌 ${escapeHtml(card.source || "佛经讲解")}</div>
-                    <button class="swipe-fav-btn ${isFav ? 'active' : ''}" data-id="${card.id}">${isFav ? "❤️" : "🤍"}</button>
-                </div>
-            </div>
-        `;
-        const favBtn = swipeContainer.querySelector(".swipe-fav-btn");
-        if (favBtn) {
-            favBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                toggleFavorite(card.id);
-                renderCurrentSwipeCard(); // 刷新
-            });
-        }
-        // 双击收藏
-        const cardInner = swipeContainer.querySelector(".card-inner");
-        if (cardInner) {
-            cardInner.addEventListener("dblclick", (e) => {
-                e.stopPropagation();
-                toggleFavorite(card.id);
-                const btn = swipeContainer.querySelector(".swipe-fav-btn");
-                if (btn) {
-                    btn.style.transform = "scale(1.2)";
-                    setTimeout(() => { if(btn) btn.style.transform = ""; }, 150);
-                }
-                renderCurrentSwipeCard();
-            });
-        }
-    }
-    function nextCard() {
-        if (isAnimating) return;
-        isAnimating = true;
-        const currentCardDiv = document.querySelector(".swipe-card");
-        if (!currentCardDiv) {
-            currentCardIndex++;
-            ensureQueueValid();
-            renderCurrentSwipeCard();
-            isAnimating = false;
-            return;
-        }
-        currentCardDiv.style.transition = "transform 0.3s ease, opacity 0.25s ease";
-        currentCardDiv.style.transform = "translateY(-30px)";
-        currentCardDiv.style.opacity = "0";
+        swipeCardBox.className = "swipe-card-box animating-out";
+        
         setTimeout(() => {
-            currentCardIndex++;
-            ensureQueueValid();
-            renderCurrentSwipeCard();
-            const newCard = document.querySelector(".swipe-card");
-            if (newCard) {
-                newCard.style.transition = "transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.3s ease";
-                newCard.style.transform = "translateY(30px)";
-                newCard.style.opacity = "0";
-                newCard.offsetHeight;
-                newCard.style.transform = "translateY(0)";
-                newCard.style.opacity = "1";
-            }
-            isAnimating = false;
-        }, 250);
+            currentQueueIndex++;
+            renderImmersiveCard();
+            swipeCardBox.className = "swipe-card-box";
+            swipeCardBox.offsetHeight; // 强制重绘
+            swipeCardBox.className = "swipe-card-box animating-in";
+            
+            setTimeout(() => {
+                swipeCardBox.className = "swipe-card-box";
+                isPageAnimating = false;
+            }, 300);
+        }, 220);
     }
-    function showImmersiveToast(msg) {
-        let toast = document.querySelector(".immersive-toast");
-        if (!toast) {
-            toast = document.createElement("div");
-            toast.className = "immersive-toast";
-            toast.style.position = "fixed";
-            toast.style.bottom = "100px";
-            toast.style.left = "50%";
-            toast.style.transform = "translateX(-50%)";
-            toast.style.backgroundColor = "rgba(0,0,0,0.6)";
-            toast.style.color = "white";
-            toast.style.padding = "6px 16px";
-            toast.style.borderRadius = "40px";
-            toast.style.fontSize = "0.75rem";
-            toast.style.zIndex = "1000";
-            toast.style.backdropFilter = "blur(8px)";
-            document.body.appendChild(toast);
+
+    // 手势侦听器
+    let touchYStart = 0;
+    swipeCardBox.addEventListener("touchstart", (e) => {
+        touchYStart = e.touches[0].clientY;
+    }, { passive: true });
+
+    swipeCardBox.addEventListener("touchend", (e) => {
+        const touchYEnd = e.changedTouches[0].clientY;
+        const diff = touchYStart - touchYEnd;
+        if (diff > 50) { // 向上划动过 50 像素，切下一张
+            triggerNextImmersiveCard();
         }
-        toast.innerText = msg;
-        toast.style.opacity = "1";
-        setTimeout(() => { toast.style.opacity = "0"; }, 1500);
-    }
+    }, { passive: true });
 
-    // 手势
-    let touchStartY = 0;
-    let isSwiping = false;
-    function onTouchStart(e) {
-        touchStartY = e.touches[0].clientY;
-        isSwiping = true;
-        e.preventDefault();
-    }
-    function onTouchMove(e) {
-        if (!isSwiping) return;
-        e.preventDefault();
-    }
-    function onTouchEnd(e) {
-        if (!isSwiping) return;
-        const deltaY = e.changedTouches[0].clientY - touchStartY;
-        if (Math.abs(deltaY) > 40) {
-            if (deltaY < 0) nextCard();
+    // 点击小字切下一页
+    hintText.onclick = () => triggerNextImmersiveCard();
+
+
+    // ---------- 模式核心控制中枢（拒绝套娃） ----------
+    function switchDisplayMode(targetMode) {
+        currentAppMode = targetMode;
+        
+        // 激活对应的Tab样式
+        document.querySelectorAll(".tab").forEach(t => {
+            if(t.getAttribute("data-mode") === targetMode) t.classList.add("active");
+            else t.classList.remove("active");
+        });
+
+        // 隐藏搜索重置键
+        if (targetMode !== "search") {
+            document.getElementById("clearSearchBtn").style.display = "none";
+            document.getElementById("searchInput").value = "";
         }
-        isSwiping = false;
-    }
-    function bindSwipeEvents() {
-        const area = document.getElementById("cardSwipeContainer");
-        if (!area) return;
-        area.removeEventListener("touchstart", onTouchStart);
-        area.removeEventListener("touchmove", onTouchMove);
-        area.removeEventListener("touchend", onTouchEnd);
-        area.addEventListener("touchstart", onTouchStart, { passive: false });
-        area.addEventListener("touchmove", onTouchMove, { passive: false });
-        area.addEventListener("touchend", onTouchEnd);
+
+        // 核心显示分流
+        if (targetMode === "random") {
+            immersiveView.classList.remove("hidden");
+            listView.classList.add("hidden");
+            renderImmersiveCard();
+        } else {
+            immersiveView.classList.add("hidden");
+            listView.classList.remove("hidden");
+            
+            if (targetMode === "favorites") renderFavoritesList();
+            if (targetMode === "journal") renderJournalView();
+        }
+        changeBannerWisdom();
     }
 
-    // 进入沉浸模式
-    function enterImmersiveMode() {
-        normalModeDiv.style.display = "none";
-        immersiveModeDiv.classList.remove("hidden");
-        rebuildRandomQueue();
-        currentCardIndex = 0;
-        renderCurrentSwipeCard();
-        bindSwipeEvents();
-        immersiveHint.onclick = () => nextCard();
-        setRandomWisdom(); // 刷新励志语
-    }
-    // 退出沉浸模式，返回主页
-    function exitImmersiveMode() {
-        normalModeDiv.style.display = "flex";
-        immersiveModeDiv.classList.add("hidden");
-        // 刷新普通模式当前内容（保持原来的模式）
-        refreshNormalView();
-        setRandomWisdom();
-    }
-
-    // ---------- 6. 辅助函数 ----------
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
+    // ---------- 常规列表流视图渲染器 ----------
+    function buildCommonCards(dataList) {
+        cardsContainer.innerHTML = "";
+        if(dataList.length === 0) {
+            cardsContainer.innerHTML = `<div style="text-align:center;padding:40px;color:#b8a88a;">空空如也</div>`;
+            return;
+        }
+        dataList.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+                <div class="question">❓ ${item.question}</div>
+                <div class="answer">📝 ${item.answer}</div>
+                <div class="source">📌 ${item.source}</div>
+                <button class="fav-btn">${isFav(item.id) ? "❤️" : "🤍"}</button>
+            `;
+            card.querySelector(".fav-btn").onclick = () => {
+                toggleFav(item.id);
+                buildCommonCards(dataList); // 重新洗牌当前视图
+            };
+            cardsContainer.appendChild(card);
+        });
     }
 
-    // 初始化
-    function init() {
-        loadFavorites();
-        loadJournal();
-        setRandomWisdom();
-        // 普通模式默认显示随机列表
-        renderRandomList();
-        // 绑定普通模式事件
-        document.getElementById("searchBtn").addEventListener("click", performSearch);
-        document.getElementById("clearSearchBtn").addEventListener("click", exitSearch);
+    function renderFavoritesList() {
+        const favs = fullKnowledge.filter(k => isFav(k.id));
+        buildCommonCards(favs);
+        statusMessage.innerText = `⭐ 当前共珍藏了 ${favs.length} 条佛学智慧`;
+    }
+
+    // ---------- 搜索控制 ----------
+    function executeSearch() {
+        const val = document.getElementById("searchInput").value.trim().toLowerCase();
+        if(!val) return;
+        searchResults = fullKnowledge.filter(k => k.question.toLowerCase().includes(val) || k.answer.toLowerCase().includes(val));
+        
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.getElementById("clearSearchBtn").style.display = "inline-block";
+        
+        immersiveView.classList.add("hidden");
+        listView.classList.remove("hidden");
+        buildCommonCards(searchResults);
+        statusMessage.innerText = `🔍 围绕关键词为您搜寻到 ${searchResults.length} 条讲解`;
+    }
+
+    // ---------- 修行功课模块 ----------
+    function fetchTodayDate() { return new Date().toISOString().slice(0, 10); }
+    function renderJournalView() {
+        statusMessage.innerText = "";
+        const today = fetchTodayDate();
+        const todayData = journalEntries.find(j => j.date === today);
+
+        listView.innerHTML = `
+            <div class="journal-area">
+                <div class="journal-date">📅 今日修持 · ${today}</div>
+                <textarea id="journalInput" class="journal-input" rows="3" placeholder="写下今日的坐禅时间、诵经遍数或心得感受..."></textarea>
+                <button id="journalSaveBtn" class="journal-save">保存记录</button>
+            </div>
+            <div class="journal-area">
+                <div class="journal-date">📜 功课法薄历史</div>
+                <div id="journalHistoryContainer"></div>
+            </div>
+            <footer>🙏 精进不懈 · 随喜赞叹</footer>
+        `;
+
+        const input = document.getElementById("journalInput");
+        if(todayData) input.value = todayData.text;
+
+        document.getElementById("journalSaveBtn").onclick = () => {
+            const txt = input.value.trim();
+            const idx = journalEntries.findIndex(j => j.date === today);
+            if(idx > -1) journalEntries[idx].text = txt;
+            else journalEntries.unshift({ date: today, text: txt });
+            localStorage.setItem("buddha_journal", JSON.stringify(journalEntries));
+            alert("功课已记录在册");
+            renderJournalView();
+        };
+
+        const histBox = document.getElementById("journalHistoryContainer");
+        const historical = journalEntries.filter(j => j.date !== today);
+        if(historical.length === 0) {
+            histBox.innerHTML = `<div style="color:#bcae9a;font-size:0.8rem;padding:10px 0;">暂无过往修持历史</div>`;
+        } else {
+            historical.forEach(h => {
+                const row = document.createElement("div");
+                row.className = "history-item";
+                row.innerHTML = `
+                    <div class="history-date"><span>📆 ${h.date}</span><button class="edit-history" data-date="${h.date}">改动</button></div>
+                    <div class="history-text">${h.text || '无心得描述'}</div>
+                `;
+                row.querySelector(".edit-history").onclick = () => {
+                    const nextText = prompt("修正该日的修行记录：", h.text);
+                    if(nextText !== null) {
+                        const target = journalEntries.find(j => j.date === h.date);
+                        if(target) target.text = nextText;
+                        localStorage.setItem("buddha_journal", JSON.stringify(journalEntries));
+                        renderJournalView();
+                    }
+                };
+                histBox.appendChild(row);
+            });
+        }
+    }
+
+    // ---------- 页面初始化引导 ----------
+    function entrypoint() {
+        loadStorage();
+        initRandomQueue();
+        changeBannerWisdom();
+        
+        // 绑定头部Tab事件
         document.querySelectorAll(".tab").forEach(tab => {
             tab.addEventListener("click", () => {
-                const mode = tab.getAttribute("data-mode");
-                if (mode) handleNormalTabClick(mode);
+                const targetMode = tab.getAttribute("data-mode");
+                // 修复大模型打架的核心：点击Tab时，如果已经是该模式则不复写
+                if(targetMode) {
+                    // 如果原本是功课模板，DOM被复写了，需要重置基础DOM容器
+                    if(document.getElementById("cardsContainer") === null) {
+                        listView.innerHTML = `<div id="cardsContainer"></div><div id="statusMessage" class="status-message"></div><footer>🙏 精进不懈 · 随喜赞叹</footer>`;
+                        // 重新挂载局部DOM指针
+                        window.cardsContainer = document.getElementById("cardsContainer");
+                        window.statusMessage = document.getElementById("statusMessage");
+                    }
+                    switchDisplayMode(targetMode);
+                }
             });
         });
-        // 沉浸模式返回按钮
-        backHomeBtn.addEventListener("click", exitImmersiveMode);
-        // 普通模式的随机推送Tab改成进入沉浸模式：点击随机推送Tab时直接进入沉浸模式
-        // 但为了保留Tab切换逻辑，我们重写random tab的点击：先切换到普通模式的random（但实际我们希望点击随机推送进入沉浸）
-        // 修改：当用户点击“随机推送”Tab时，直接进入沉浸模式，而不是显示列表。
-        const randomTab = document.querySelector(".tab[data-mode='random']");
-        const originalClick = randomTab.onclick;
-        randomTab.addEventListener("click", (e) => {
-            e.stopPropagation();
-            enterImmersiveMode();
-        });
-        // 其他Tab保持原样
-        const favTab = document.querySelector(".tab[data-mode='favorites']");
-        const journalTab = document.querySelector(".tab[data-mode='journal']");
-        favTab.addEventListener("click", () => {
-            handleNormalTabClick("favorites");
-        });
-        journalTab.addEventListener("click", () => {
-            handleNormalTabClick("journal");
-        });
+
+        // 绑定搜索
+        document.getElementById("searchBtn").onclick = executeSearch;
+        document.getElementById("clearSearchBtn").onclick = () => switchDisplayMode("random");
+
+        // 默认初始化沉浸单卡状态
+        switchDisplayMode("random");
     }
-    init();
+
+    window.onload = entrypoint;
 </script>
 </body>
 </html>
