@@ -27,9 +27,13 @@
             background: #faf7f2;
             position: relative;
         }
-        /* 全局顶部励志语 - 永远常驻 */
+        
+        /* 全局顶部励志语 */
         .global-banner {
-            flex-shrink: 0;
+            display: block !important;
+            flex-shrink: 0 !important;
+            height: auto !important;
+            min-height: 38px;
             background: #e6d5b8;
             padding: 10px 16px;
             text-align: center;
@@ -41,8 +45,10 @@
             white-space: nowrap;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            z-index: 99;
         }
-        /* 全局头部导航栏 - 永远常驻，拒绝死胡同 */
+        
+        /* 全局头部导航栏 */
         .global-header {
             flex-shrink: 0;
             padding: 12px 16px 8px;
@@ -108,7 +114,7 @@
             overflow: hidden;
         }
 
-        /* 模式一：普通列表视窗（收藏、搜索、功课共用） */
+        /* 模式一：普通列表视窗 */
         .list-view-window {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -122,34 +128,34 @@
         .list-view-window .card {
             background: white;
             border-radius: 28px;
-            padding: 20px;
+            padding: 24px;
             position: relative;
             border: 1px solid #ece1d4;
             box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
         .list-view-window .question {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 700;
             padding-right: 48px;
             margin-bottom: 12px;
             color: #3e2a1f;
         }
         .list-view-window .answer {
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.98rem;
+            line-height: 1.6;
             color: #5a4a3a;
         }
         .list-view-window .fav-btn {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 20px;
+            right: 20px;
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
         }
 
-        /* 模式二：沉浸式简讯滑屏视窗 */
+        /* 模式二：沉浸式简讯滑屏视窗（重构舞台布局） */
         .immersive-view-window {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -157,15 +163,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
         }
+        
+        /* 彻底干掉硬性高度束缚，用呼吸感内边距撑开 */
         .swipe-card-box {
             width: 100%;
-            max-height: 75%;
             background: white;
-            border-radius: 36px;
-            padding: 32px 28px;
-            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.1);
+            border-radius: 38px;
+            padding: 40px 32px; /* 极大幅度增加上下留白 */
+            box-shadow: 0 16px 40px -12px rgba(74, 55, 39, 0.08);
             border: 1px solid #ece1d4;
             position: relative;
             overflow-y: auto;
@@ -182,47 +189,52 @@
             transform: translateY(0);
             opacity: 1;
         }
+        
+        /* 强化标题：增大、加宽间距、彻底告别窄小压抑 */
         .card-question {
-            font-size: 1.6rem;
-            font-weight: 700;
-            line-height: 1.4;
-            margin-bottom: 20px;
-            color: #3e2a1f;
-            padding-right: 48px;
+            font-size: 1.75rem; /* 大幅放大标题 */
+            font-weight: 800;
+            line-height: 1.45;
+            margin-bottom: 26px; /* 与正文隔开距离，形成透气感 */
+            color: #2e1f16;
+            padding-right: 52px; /* 给右侧红心留足空间 */
+            letter-spacing: 0.5px;
         }
+        
+        /* 优化正文：字号增大，行间距拉宽，极其适合舒适阅读 */
         .card-answer {
-            font-size: 1.05rem;
-            line-height: 1.65;
-            color: #5a4a3a;
+            font-size: 1.1rem; 
+            line-height: 1.75;
+            color: #4a3c31;
             white-space: pre-wrap;
         }
         .card-source {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #b8a88a;
-            margin-top: 24px;
-            padding-top: 12px;
-            border-top: 1px solid #f0e8e0;
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid #f5ede4;
         }
         .swipe-fav-btn {
             position: absolute;
-            top: 24px;
-            right: 24px;
+            top: 36px;
+            right: 28px;
             background: none;
             border: none;
-            font-size: 1.9rem;
+            font-size: 2rem;
             cursor: pointer;
             transition: transform 0.15s;
         }
 
-        /* 紧贴卡片下方的新手引导提示字（彻底解决掉到底部的Bug） */
+        /* 紧贴卡片下方的新手引导提示字 */
         .hint-text-under-card {
-            margin-top: 20px;
+            margin-top: 24px;
             text-align: center;
             color: #bcae9a;
             font-size: 12px;
             cursor: pointer;
-            padding: 8px 16px;
-            background: rgba(0,0,0,0.02);
+            padding: 8px 18px;
+            background: rgba(74, 55, 39, 0.03);
             border-radius: 20px;
             letter-spacing: 0.5px;
             transition: background 0.2s;
@@ -236,33 +248,31 @@
         .journal-area {
             background: white;
             border-radius: 28px;
-            padding: 20px;
+            padding: 24px;
             margin-bottom: 20px;
             border: 1px solid #ece1d4;
         }
         .journal-date { font-weight: 700; margin-bottom: 12px; color: #b45f2b; }
         .journal-input {
-            width: 100%; padding: 12px; border: 1px solid #e6d9ce;
-            border-radius: 24px; font-family: inherit; margin-bottom: 10px; outline: none;
+            width: 100%; padding: 14px; border: 1px solid #e6d9ce;
+            border-radius: 24px; font-family: inherit; margin-bottom: 12px; outline: none; font-size: 1rem;
         }
         .journal-save {
-            background: #e0d6cc; border: none; padding: 6px 16px;
+            background: #e0d6cc; border: none; padding: 8px 20px;
             border-radius: 30px; cursor: pointer; color: #4a3727; font-weight: 600;
         }
         .history-item { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed #eee3d8; }
-        .history-date { font-size: 0.7rem; color: #a2856a; display: flex; justify-content: space-between; }
+        .history-date { font-size: 0.75rem; color: #a2856a; display: flex; justify-content: space-between; }
         .edit-history { background: none; border: none; color: #b45f2b; cursor: pointer; }
-        .history-text { font-size: 0.85rem; margin-top: 4px; color: #5a4a3a; }
+        .history-text { font-size: 0.9rem; margin-top: 6px; color: #5a4a3a; line-height: 1.5; }
         .status-message { text-align: center; padding: 12px; color: #b8a88a; font-size: 0.75rem; }
-        footer { text-align: center; font-size: 0.6rem; color: #cbbc9f; padding: 15px; margin-top: auto; }
+        footer { text-align: center; font-size: 0.65rem; color: #cbbc9f; padding: 20px; margin-top: auto; }
     </style>
 </head>
 <body>
 <div class="app">
-    <!-- 1. 全局最顶端励志语栏 -->
     <div class="global-banner" id="globalWisdom">⚡ 正在接入净土数据...</div>
 
-    <!-- 2. 全局常驻操作头栏 -->
     <div class="global-header">
         <div class="search-bar">
             <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索佛经讲解... 如：放下、因果">
@@ -276,18 +286,13 @@
         </div>
     </div>
 
-    <!-- 3. 核心切换舞台（两个视窗独立并存，绝不打架） -->
     <div class="stage-container">
-        <!-- 视窗A：简讯单卡沉浸流 -->
         <div id="immersiveView" class="immersive-view-window">
             <div id="swipeCardBox" class="swipe-card-box">
-                <!-- 由JS注入卡片内部 -->
-            </div>
-            <!-- 紧贴在卡片下方的多功能备用引导字 -->
+                </div>
             <div id="hintText" class="hint-text-under-card">⬆️ 往上滑动 或 点击此处 查看下一条</div>
         </div>
 
-        <!-- 视窗B：常规列表流 -->
         <div id="listView" class="list-view-window hidden">
             <div id="cardsContainer"></div>
             <div id="statusMessage" class="status-message"></div>
@@ -323,16 +328,14 @@
         "⚡ 生死事大，无常迅速，各自努力，莫再蹉跎。"
     ];
 
-    // 全局驱动状态
     let favoriteIds = new Set();
     let journalEntries = [];
-    let currentAppMode = "random"; // random, favorites, journal, search
+    let currentAppMode = "random"; 
     let searchResults = [];
     let randomQueue = [];
     let currentQueueIndex = 0;
     let isPageAnimating = false;
 
-    // DOM 锚点
     const immersiveView = document.getElementById("immersiveView");
     const listView = document.getElementById("listView");
     const swipeCardBox = document.getElementById("swipeCardBox");
@@ -340,7 +343,6 @@
     const statusMessage = document.getElementById("statusMessage");
     const hintText = document.getElementById("hintText");
 
-    // ---------- 数据存储核心 ----------
     function loadStorage() {
         const favs = localStorage.getItem("buddha_favorites");
         if (favs) try { favoriteIds = new Set(JSON.parse(favs)); } catch(e){}
@@ -358,7 +360,6 @@
         document.getElementById("globalWisdom").innerText = wisdomQuotes[Math.floor(Math.random() * wisdomQuotes.length)];
     }
 
-    // ---------- 沉浸式单卡核心渲染与手势 ----------
     function initRandomQueue() {
         randomQueue = [...fullKnowledge].sort(() => Math.random() - 0.5);
         currentQueueIndex = 0;
@@ -366,9 +367,8 @@
 
     function renderImmersiveCard() {
         if (randomQueue.length === 0) initRandomQueue();
-        if (currentQueueIndex >= randomQueue.length) {
-            initRandomQueue();
-        }
+        if (currentQueueIndex >= randomQueue.length) initRandomQueue();
+        
         const item = randomQueue[currentQueueIndex];
         if (!item) return;
 
@@ -379,14 +379,12 @@
             <button class="swipe-fav-btn" id="swipeFavBtn">${isFav(item.id) ? "❤️" : "🤍"}</button>
         `;
 
-        // 单击收藏按钮
         document.getElementById("swipeFavBtn").onclick = (e) => {
             e.stopPropagation();
             toggleFav(item.id);
             document.getElementById("swipeFavBtn").innerText = isFav(item.id) ? "❤️" : "🤍";
         };
 
-        // 双击卡片快速收藏
         swipeCardBox.ondblclick = (e) => {
             e.stopPropagation();
             toggleFav(item.id);
@@ -407,7 +405,7 @@
             currentQueueIndex++;
             renderImmersiveCard();
             swipeCardBox.className = "swipe-card-box";
-            swipeCardBox.offsetHeight; // 强制重绘
+            swipeCardBox.offsetHeight; 
             swipeCardBox.className = "swipe-card-box animating-in";
             
             setTimeout(() => {
@@ -417,7 +415,6 @@
         }, 220);
     }
 
-    // 手势侦听器
     let touchYStart = 0;
     swipeCardBox.addEventListener("touchstart", (e) => {
         touchYStart = e.touches[0].clientY;
@@ -426,32 +423,24 @@
     swipeCardBox.addEventListener("touchend", (e) => {
         const touchYEnd = e.changedTouches[0].clientY;
         const diff = touchYStart - touchYEnd;
-        if (diff > 50) { // 向上划动过 50 像素，切下一张
-            triggerNextImmersiveCard();
-        }
+        if (diff > 50) triggerNextImmersiveCard();
     }, { passive: true });
 
-    // 点击小字切下一页
     hintText.onclick = () => triggerNextImmersiveCard();
 
-
-    // ---------- 模式核心控制中枢（拒绝套娃） ----------
     function switchDisplayMode(targetMode) {
         currentAppMode = targetMode;
         
-        // 激活对应的Tab样式
         document.querySelectorAll(".tab").forEach(t => {
             if(t.getAttribute("data-mode") === targetMode) t.classList.add("active");
             else t.classList.remove("active");
         });
 
-        // 隐藏搜索重置键
         if (targetMode !== "search") {
             document.getElementById("clearSearchBtn").style.display = "none";
             document.getElementById("searchInput").value = "";
         }
 
-        // 核心显示分流
         if (targetMode === "random") {
             immersiveView.classList.remove("hidden");
             listView.classList.add("hidden");
@@ -466,7 +455,6 @@
         changeBannerWisdom();
     }
 
-    // ---------- 常规列表流视图渲染器 ----------
     function buildCommonCards(dataList) {
         cardsContainer.innerHTML = "";
         if(dataList.length === 0) {
@@ -484,7 +472,7 @@
             `;
             card.querySelector(".fav-btn").onclick = () => {
                 toggleFav(item.id);
-                buildCommonCards(dataList); // 重新洗牌当前视图
+                buildCommonCards(dataList);
             };
             cardsContainer.appendChild(card);
         });
@@ -496,7 +484,6 @@
         statusMessage.innerText = `⭐ 当前共珍藏了 ${favs.length} 条佛学智慧`;
     }
 
-    // ---------- 搜索控制 ----------
     function executeSearch() {
         const val = document.getElementById("searchInput").value.trim().toLowerCase();
         if(!val) return;
@@ -511,7 +498,6 @@
         statusMessage.innerText = `🔍 围绕关键词为您搜寻到 ${searchResults.length} 条讲解`;
     }
 
-    // ---------- 修行功课模块 ----------
     function fetchTodayDate() { return new Date().toISOString().slice(0, 10); }
     function renderJournalView() {
         statusMessage.innerText = "";
@@ -570,22 +556,17 @@
         }
     }
 
-    // ---------- 页面初始化引导 ----------
     function entrypoint() {
         loadStorage();
         initRandomQueue();
         changeBannerWisdom();
         
-        // 绑定头部Tab事件
         document.querySelectorAll(".tab").forEach(tab => {
             tab.addEventListener("click", () => {
                 const targetMode = tab.getAttribute("data-mode");
-                // 修复大模型打架的核心：点击Tab时，如果已经是该模式则不复写
                 if(targetMode) {
-                    // 如果原本是功课模板，DOM被复写了，需要重置基础DOM容器
                     if(document.getElementById("cardsContainer") === null) {
                         listView.innerHTML = `<div id="cardsContainer"></div><div id="statusMessage" class="status-message"></div><footer>🙏 精进不懈 · 随喜赞叹</footer>`;
-                        // 重新挂载局部DOM指针
                         window.cardsContainer = document.getElementById("cardsContainer");
                         window.statusMessage = document.getElementById("statusMessage");
                     }
@@ -594,11 +575,9 @@
             });
         });
 
-        // 绑定搜索
         document.getElementById("searchBtn").onclick = executeSearch;
         document.getElementById("clearSearchBtn").onclick = () => switchDisplayMode("random");
 
-        // 默认初始化沉浸单卡状态
         switchDisplayMode("random");
     }
 
