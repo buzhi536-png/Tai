@@ -2,586 +2,267 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>佛经碎片学习 · 沉浸简讯流</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>简讯·实修卡片盒</title>
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: #faf7f2;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            color: #2e241f;
-            height: 100vh;
-            overflow: hidden;
-        }
-        .app {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-            background: #faf7f2;
-            position: relative;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; background-color: #f4f3ef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
         
-        /* 全局顶部励志语 */
-        .global-banner {
-            display: block !important;
-            flex-shrink: 0 !important;
-            height: auto !important;
-            min-height: 38px;
-            background: #e6d5b8;
-            padding: 10px 16px;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #4a3727;
-            letter-spacing: 1px;
-            border-bottom: 1px solid #dccfbc;
-            white-space: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            z-index: 99;
-        }
+        /* 1. 开屏警策晨钟 */
+        #alert-bell { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; color: #ffffff; text-align: center; transition: opacity 0.5s ease; }
+        #bell-title { font-size: 14px; color: #aeaeae; letter-spacing: 4px; margin-bottom: 30px; }
+        #bell-content { font-size: 20px; line-height: 1.8; color: #f5f5f7; margin-bottom: 40px; font-weight: 300; }
+        #bell-btn { background: none; border: 1px solid #545456; color: #eaeaea; padding: 10px 30px; border-radius: 20px; font-size: 14px; }
+
+        /* 2. 顶部工具栏 */
+        .header-bar { position: absolute; top: 0; left: 0; width: 100%; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 10; background: rgba(244,243,239,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid #e5e4df; }
+        .page-title { font-size: 16px; font-weight: 600; color: #33322e; margin-right: 10px; white-space: nowrap; }
+        .search-input { flex: 1; height: 36px; border-radius: 18px; border: 1px solid #d2d1cb; padding: 0 15px; font-size: 13px; background: #fff; outline: none; }
         
-        /* 全局头部导航栏 */
-        .global-header {
-            flex-shrink: 0;
-            padding: 12px 16px 8px;
-            background: #faf7f2;
-            border-bottom: 1px solid #f0eae2;
-        }
-        .search-bar {
-            display: flex;
-            gap: 8px;
-            background: white;
-            padding: 6px 12px;
-            border-radius: 40px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .search-input {
-            flex: 1;
-            border: none;
-            padding: 8px 0;
-            font-size: 0.9rem;
-            background: transparent;
-            outline: none;
-        }
-        .search-btn, .clear-search {
-            background: #e0d6cc;
-            border: none;
-            padding: 4px 14px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            color: #4a3727;
-        }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            background: #f0eae2;
-            padding: 4px;
-            border-radius: 48px;
-        }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px 0;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            background: transparent;
-            color: #5a4a3a;
-            transition: 0.2s;
-        }
-        .tab.active {
-            background: #ffffff;
-            color: #b45f2b;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            font-weight: 600;
-        }
+        /* 右上角多功能控制按钮 */
+        .admin-btn { background: #8e8d8a; border: none; padding: 7px 14px; border-radius: 16px; font-size: 12px; color: #fff; font-weight: 500; margin-left: 10px; white-space: nowrap; }
+        .upload-ready { background: #0071e3 !important; } 
+        #file-input { display: none; }
 
-        /* 核心切换舞台容器 */
-        .stage-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
+        /* 网页内嵌密码输入小区域（彻底解决iOS拦截） */
+        #pwd-zone { display: none; position: absolute; right: 15px; top: 65px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #e5e4df; z-index: 20; display: none; align-items: center; }
+        #pwd-input { width: 100px; height: 28px; border: 1px solid #d2d1cb; border-radius: 6px; padding: 0 8px; font-size: 12px; outline: none; margin-right: 8px; }
+        #pwd-submit { background: #333; color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
 
-        /* 模式一：普通列表视窗 */
-        .list-view-window {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .list-view-window .card {
-            background: white;
-            border-radius: 28px;
-            padding: 24px;
-            position: relative;
-            border: 1px solid #ece1d4;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        }
-        .list-view-window .question {
-            font-size: 1.25rem;
-            font-weight: 700;
-            padding-right: 48px;
-            margin-bottom: 12px;
-            color: #3e2a1f;
-        }
-        .list-view-window .answer {
-            font-size: 0.98rem;
-            line-height: 1.6;
-            color: #5a4a3a;
-        }
-        .list-view-window .fav-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* 模式二：沉浸式简讯滑屏视窗（重构舞台布局） */
-        .immersive-view-window {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
+        /* 3. 卡片流样式 */
+        .swiper-container { width: 100%; height: 100%; }
+        .swiper-slide { display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: 75px; }
         
-        /* 彻底干掉硬性高度束缚，用呼吸感内边距撑开 */
-        .swipe-card-box {
-            width: 100%;
-            background: white;
-            border-radius: 38px;
-            padding: 40px 32px; /* 极大幅度增加上下留白 */
-            box-shadow: 0 16px 40px -12px rgba(74, 55, 39, 0.08);
-            border: 1px solid #ece1d4;
-            position: relative;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            will-change: transform, opacity;
-        }
-        .swipe-card-box.animating-out {
-            transition: transform 0.25s ease, opacity 0.2s ease;
-            transform: translateY(-40px);
-            opacity: 0;
-        }
-        .swipe-card-box.animating-in {
-            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.25s ease;
-            transform: translateY(0);
-            opacity: 1;
-        }
+        /* 宣纸感卡片设计 */
+        .card { background: #fdfcf7; width: 100%; height: 82%; max-width: 420px; border-radius: 20px; padding: 28px; box-shadow: 0 6px 20px rgba(51,50,46,0.06); display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0,0,0,0.03); position: relative; }
+        .card-content { font-size: 18px; line-height: 1.8; color: #2b2a27; text-align: justify; overflow-y: auto; }
         
-        /* 强化标题：增大、加宽间距、彻底告别窄小压抑 */
-        .card-question {
-            font-size: 1.75rem; /* 大幅放大标题 */
-            font-weight: 800;
-            line-height: 1.45;
-            margin-bottom: 26px; /* 与正文隔开距离，形成透气感 */
-            color: #2e1f16;
-            padding-right: 52px; /* 给右侧红心留足空间 */
-            letter-spacing: 0.5px;
-        }
-        
-        /* 优化正文：字号增大，行间距拉宽，极其适合舒适阅读 */
-        .card-answer {
-            font-size: 1.1rem; 
-            line-height: 1.75;
-            color: #4a3c31;
-            white-space: pre-wrap;
-        }
-        .card-source {
-            font-size: 0.8rem;
-            color: #b8a88a;
-            margin-top: 32px;
-            padding-top: 16px;
-            border-top: 1px solid #f5ede4;
-        }
-        .swipe-fav-btn {
-            position: absolute;
-            top: 36px;
-            right: 28px;
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
+        /* 删除按钮 */
+        .admin-delete-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,59,48,0.1); color: #ff3b30; border: none; padding: 4px 10px; border-radius: 12px; font-size: 11px; display: none; cursor: pointer; }
 
-        /* 紧贴卡片下方的新手引导提示字 */
-        .hint-text-under-card {
-            margin-top: 24px;
-            text-align: center;
-            color: #bcae9a;
-            font-size: 12px;
-            cursor: pointer;
-            padding: 8px 18px;
-            background: rgba(74, 55, 39, 0.03);
-            border-radius: 20px;
-            letter-spacing: 0.5px;
-            transition: background 0.2s;
-        }
-        .hint-text-under-card:active {
-            background: rgba(0,0,0,0.06);
-        }
-
-        /* 工具统一样式 */
-        .hidden { display: none !important; }
-        .journal-area {
-            background: white;
-            border-radius: 28px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid #ece1d4;
-        }
-        .journal-date { font-weight: 700; margin-bottom: 12px; color: #b45f2b; }
-        .journal-input {
-            width: 100%; padding: 14px; border: 1px solid #e6d9ce;
-            border-radius: 24px; font-family: inherit; margin-bottom: 12px; outline: none; font-size: 1rem;
-        }
-        .journal-save {
-            background: #e0d6cc; border: none; padding: 8px 20px;
-            border-radius: 30px; cursor: pointer; color: #4a3727; font-weight: 600;
-        }
-        .history-item { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed #eee3d8; }
-        .history-date { font-size: 0.75rem; color: #a2856a; display: flex; justify-content: space-between; }
-        .edit-history { background: none; border: none; color: #b45f2b; cursor: pointer; }
-        .history-text { font-size: 0.9rem; margin-top: 6px; color: #5a4a3a; line-height: 1.5; }
-        .status-message { text-align: center; padding: 12px; color: #b8a88a; font-size: 0.75rem; }
-        footer { text-align: center; font-size: 0.65rem; color: #cbbc9f; padding: 20px; margin-top: auto; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f2f1eb; padding-top: 12px; margin-top: 12px; }
+        .card-meta { font-size: 11px; color: #8e8d8a; }
+        .fav-btn { background: none; border: none; font-size: 22px; color: #d2d1cb; cursor: pointer; }
+        .fav-btn.active { color: #ffb703; }
     </style>
 </head>
 <body>
-<div class="app">
-    <div class="global-banner" id="globalWisdom">⚡ 正在接入净土数据...</div>
 
-    <div class="global-header">
-        <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜索佛经讲解... 如：放下、因果">
-            <button id="searchBtn" class="search-btn">搜索</button>
-            <button id="clearSearchBtn" class="clear-search" style="display: none;">主页</button>
-        </div>
-        <div class="tabs">
-            <div class="tab active" data-mode="random">📖 随机推送</div>
-            <div class="tab" data-mode="favorites">⭐ 我的收藏</div>
-            <div class="tab" data-mode="journal">📝 修行功课</div>
-        </div>
+    <div id="alert-bell">
+        <div id="bell-title">🔔 暮鼓晨钟 · 警策精进</div>
+        <div id="bell-content">正在收摄心神...</div>
+        <button id="bell-btn" onclick="closeBell()">进入静读</button>
     </div>
 
-    <div class="stage-container">
-        <div id="immersiveView" class="immersive-view-window">
-            <div id="swipeCardBox" class="swipe-card-box">
+    <div class="header-bar">
+        <div class="page-title">简讯盒</div>
+        <input type="text" class="search-input" id="search-box" placeholder="🔍 输入困惑从资料中检索..." oninput="searchCards()">
+        
+        <button class="admin-btn" id="action-btn" onclick="handleAdminButtonClick()">验证管理</button>
+        <input type="file" id="file-input" accept=".txt" onchange="handleFileUpload(this)">
+    </div>
+
+    <div id="pwd-zone">
+        <input type="password" id="pwd-input" placeholder="输入密码">
+        <button id="pwd-submit" onclick="checkWebPassword()">确定</button>
+    </div>
+
+    <div class="swiper-container">
+        <div class="swiper-wrapper" id="card-wrapper">
+            <div class="swiper-slide">
+                <div class="card">
+                    <div class="card-content">✨ 欢迎来到你的专属卡片盒。目前尚未加载书籍。如果你是创建者，请点击右上角【验证管理】输入密码，解锁后即可导入书籍；普通用户请直接上下滑动。</div>
+                    <div class="card-footer"><span class="card-meta"># 系统引导</span><button class="fav-btn">★</button></div>
                 </div>
-            <div id="hintText" class="hint-text-under-card">⬆️ 往上滑动 或 点击此处 查看下一条</div>
-        </div>
-
-        <div id="listView" class="list-view-window hidden">
-            <div id="cardsContainer"></div>
-            <div id="statusMessage" class="status-message"></div>
-            <footer>🙏 精进不懈 · 随喜赞叹</footer>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    // ---------- 核心假数据源 ----------
-    const sampleQA = [
-        { id: "1", question: "什么是“色即是空”？", answer: "色指物质现象，空指无自性。一切物质都是因缘和合而生，没有永恒不变的实体。", source: "心经讲解" },
-        { id: "2", question: "如何理解“放下”？", answer: "放下不是放弃，而是不执着。该做的事仍然做，但心里不挂碍结果。", source: "金刚经浅释" },
-        { id: "3", question: "什么是“业力”？", answer: "业力是行为产生的潜在力量，善有善果，恶有恶报。", source: "因果道理" },
-        { id: "4", question: "如何修“慈悲心”？", answer: "从理解他人痛苦开始，先对亲近的人修，再扩展到陌生人。", source: "四无量心" },
-        { id: "5", question: "什么是“无我”？", answer: "没有一个独立、恒常的“我”，身心五蕴刹那生灭。", source: "阿含经" }
-    ];
-    let fullKnowledge = [...sampleQA];
-    for (let i = 6; i <= 35; i++) {
-        fullKnowledge.push({
-            id: String(i),
-            question: `佛学问答 ${i}：如何保持正念？`,
-            answer: `正念就是活在当下，觉知身心现象。可以从呼吸开始练习。专注于每一个呼吸的起伏。`,
-            source: "正念禅修"
-        });
-    }
-
-    const wisdomQuotes = [
-        "⏳ 是日已过，命亦随减，如少水鱼，斯有何乐？",
-        "🔥 大众当勤精进，如救头燃，但念无常，慎勿放逸。",
-        "🌅 每一天都是生命的倒计时，今日不修，更待何时？",
-        "🧘 暇满人身难得，正法难遇，此刻不修，更待何时？",
-        "⚡ 生死事大，无常迅速，各自努力，莫再蹉跎。"
-    ];
-
-    let favoriteIds = new Set();
-    let journalEntries = [];
-    let currentAppMode = "random"; 
-    let searchResults = [];
-    let randomQueue = [];
-    let currentQueueIndex = 0;
-    let isPageAnimating = false;
-
-    const immersiveView = document.getElementById("immersiveView");
-    const listView = document.getElementById("listView");
-    const swipeCardBox = document.getElementById("swipeCardBox");
-    const cardsContainer = document.getElementById("cardsContainer");
-    const statusMessage = document.getElementById("statusMessage");
-    const hintText = document.getElementById("hintText");
-
-    function loadStorage() {
-        const favs = localStorage.getItem("buddha_favorites");
-        if (favs) try { favoriteIds = new Set(JSON.parse(favs)); } catch(e){}
-        const jor = localStorage.getItem("buddha_journal");
-        if (jor) try { journalEntries = JSON.parse(jor); } catch(e){}
-    }
-    function saveFavs() { localStorage.setItem("buddha_favorites", JSON.stringify([...favoriteIds])); }
-    function isFav(id) { return favoriteIds.has(id); }
-    function toggleFav(id) {
-        isFav(id) ? favoriteIds.delete(id) : favoriteIds.add(id);
-        saveFavs();
-    }
-
-    function changeBannerWisdom() {
-        document.getElementById("globalWisdom").innerText = wisdomQuotes[Math.floor(Math.random() * wisdomQuotes.length)];
-    }
-
-    function initRandomQueue() {
-        randomQueue = [...fullKnowledge].sort(() => Math.random() - 0.5);
-        currentQueueIndex = 0;
-    }
-
-    function renderImmersiveCard() {
-        if (randomQueue.length === 0) initRandomQueue();
-        if (currentQueueIndex >= randomQueue.length) initRandomQueue();
+    <script src="https://fastly.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        const bellSayings = [
+            "是日已过，命亦随减。如少水鱼，斯有何乐？当勤精进，如救头燃。",
+            "生死事大，无常迅速。光阴可惜，时不待人。",
+            "莫把初心付流水，须知大道路途遥。珍惜当下，精进克期。"
+        ];
         
-        const item = randomQueue[currentQueueIndex];
-        if (!item) return;
+        let globalCards = JSON.parse(localStorage.getItem('all_book_cards')) || [];
+        let swiperInstance = null;
+        let isAdmin = localStorage.getItem('is_admin_user') === 'true'; 
 
-        swipeCardBox.innerHTML = `
-            <div class="card-question">❓ ${item.question}</div>
-            <div class="card-answer">📝 ${item.answer}</div>
-            <div class="card-source">📌 ${item.source}</div>
-            <button class="swipe-fav-btn" id="swipeFavBtn">${isFav(item.id) ? "❤️" : "🤍"}</button>
-        `;
+        // 初始化一闪而过的警句
+        document.getElementById('bell-content').innerText = bellSayings[Math.floor(Math.random() * bellSayings.length)];
 
-        document.getElementById("swipeFavBtn").onclick = (e) => {
-            e.stopPropagation();
-            toggleFav(item.id);
-            document.getElementById("swipeFavBtn").innerText = isFav(item.id) ? "❤️" : "🤍";
-        };
-
-        swipeCardBox.ondblclick = (e) => {
-            e.stopPropagation();
-            toggleFav(item.id);
-            const btn = document.getElementById("swipeFavBtn");
-            btn.innerText = isFav(item.id) ? "❤️" : "🤍";
-            btn.style.transform = "scale(1.4)";
-            setTimeout(() => btn.style.transform = "scale(1)", 150);
-        };
-    }
-
-    function triggerNextImmersiveCard() {
-        if (isPageAnimating) return;
-        isPageAnimating = true;
-
-        swipeCardBox.className = "swipe-card-box animating-out";
-        
-        setTimeout(() => {
-            currentQueueIndex++;
-            renderImmersiveCard();
-            swipeCardBox.className = "swipe-card-box";
-            swipeCardBox.offsetHeight; 
-            swipeCardBox.className = "swipe-card-box animating-in";
-            
+        function closeBell() {
+            document.getElementById('alert-bell').style.opacity = '0';
             setTimeout(() => {
-                swipeCardBox.className = "swipe-card-box";
-                isPageAnimating = false;
-            }, 300);
-        }, 220);
-    }
-
-    let touchYStart = 0;
-    swipeCardBox.addEventListener("touchstart", (e) => {
-        touchYStart = e.touches[0].clientY;
-    }, { passive: true });
-
-    swipeCardBox.addEventListener("touchend", (e) => {
-        const touchYEnd = e.changedTouches[0].clientY;
-        const diff = touchYStart - touchYEnd;
-        if (diff > 50) triggerNextImmersiveCard();
-    }, { passive: true });
-
-    hintText.onclick = () => triggerNextImmersiveCard();
-
-    function switchDisplayMode(targetMode) {
-        currentAppMode = targetMode;
-        
-        document.querySelectorAll(".tab").forEach(t => {
-            if(t.getAttribute("data-mode") === targetMode) t.classList.add("active");
-            else t.classList.remove("active");
-        });
-
-        if (targetMode !== "search") {
-            document.getElementById("clearSearchBtn").style.display = "none";
-            document.getElementById("searchInput").value = "";
+                document.getElementById('alert-bell').style.display = 'none';
+                updateButtonState(); 
+                renderCards(globalCards);
+            }, 500);
         }
 
-        if (targetMode === "random") {
-            immersiveView.classList.remove("hidden");
-            listView.classList.add("hidden");
-            renderImmersiveCard();
-        } else {
-            immersiveView.classList.add("hidden");
-            listView.classList.remove("hidden");
-            
-            if (targetMode === "favorites") renderFavoritesList();
-            if (targetMode === "journal") renderJournalView();
-        }
-        changeBannerWisdom();
-    }
-
-    function buildCommonCards(dataList) {
-        cardsContainer.innerHTML = "";
-        if(dataList.length === 0) {
-            cardsContainer.innerHTML = `<div style="text-align:center;padding:40px;color:#b8a88a;">空空如也</div>`;
-            return;
-        }
-        dataList.forEach(item => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-                <div class="question">❓ ${item.question}</div>
-                <div class="answer">📝 ${item.answer}</div>
-                <div class="source">📌 ${item.source}</div>
-                <button class="fav-btn">${isFav(item.id) ? "❤️" : "🤍"}</button>
-            `;
-            card.querySelector(".fav-btn").onclick = () => {
-                toggleFav(item.id);
-                buildCommonCards(dataList);
-            };
-            cardsContainer.appendChild(card);
-        });
-    }
-
-    function renderFavoritesList() {
-        const favs = fullKnowledge.filter(k => isFav(k.id));
-        buildCommonCards(favs);
-        statusMessage.innerText = `⭐ 当前共珍藏了 ${favs.length} 条佛学智慧`;
-    }
-
-    function executeSearch() {
-        const val = document.getElementById("searchInput").value.trim().toLowerCase();
-        if(!val) return;
-        searchResults = fullKnowledge.filter(k => k.question.toLowerCase().includes(val) || k.answer.toLowerCase().includes(val));
-        
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        document.getElementById("clearSearchBtn").style.display = "inline-block";
-        
-        immersiveView.classList.add("hidden");
-        listView.classList.remove("hidden");
-        buildCommonCards(searchResults);
-        statusMessage.innerText = `🔍 围绕关键词为您搜寻到 ${searchResults.length} 条讲解`;
-    }
-
-    function fetchTodayDate() { return new Date().toISOString().slice(0, 10); }
-    function renderJournalView() {
-        statusMessage.innerText = "";
-        const today = fetchTodayDate();
-        const todayData = journalEntries.find(j => j.date === today);
-
-        listView.innerHTML = `
-            <div class="journal-area">
-                <div class="journal-date">📅 今日修持 · ${today}</div>
-                <textarea id="journalInput" class="journal-input" rows="3" placeholder="写下今日的坐禅时间、诵经遍数或心得感受..."></textarea>
-                <button id="journalSaveBtn" class="journal-save">保存记录</button>
-            </div>
-            <div class="journal-area">
-                <div class="journal-date">📜 功课法薄历史</div>
-                <div id="journalHistoryContainer"></div>
-            </div>
-            <footer>🙏 精进不懈 · 随喜赞叹</footer>
-        `;
-
-        const input = document.getElementById("journalInput");
-        if(todayData) input.value = todayData.text;
-
-        document.getElementById("journalSaveBtn").onclick = () => {
-            const txt = input.value.trim();
-            const idx = journalEntries.findIndex(j => j.date === today);
-            if(idx > -1) journalEntries[idx].text = txt;
-            else journalEntries.unshift({ date: today, text: txt });
-            localStorage.setItem("buddha_journal", JSON.stringify(journalEntries));
-            alert("功课已记录在册");
-            renderJournalView();
-        };
-
-        const histBox = document.getElementById("journalHistoryContainer");
-        const historical = journalEntries.filter(j => j.date !== today);
-        if(historical.length === 0) {
-            histBox.innerHTML = `<div style="color:#bcae9a;font-size:0.8rem;padding:10px 0;">暂无过往修持历史</div>`;
-        } else {
-            historical.forEach(h => {
-                const row = document.createElement("div");
-                row.className = "history-item";
-                row.innerHTML = `
-                    <div class="history-date"><span>📆 ${h.date}</span><button class="edit-history" data-date="${h.date}">改动</button></div>
-                    <div class="history-text">${h.text || '无心得描述'}</div>
-                `;
-                row.querySelector(".edit-history").onclick = () => {
-                    const nextText = prompt("修正该日的修行记录：", h.text);
-                    if(nextText !== null) {
-                        const target = journalEntries.find(j => j.date === h.date);
-                        if(target) target.text = nextText;
-                        localStorage.setItem("buddha_journal", JSON.stringify(journalEntries));
-                        renderJournalView();
-                    }
-                };
-                histBox.appendChild(row);
-            });
-        }
-    }
-
-    function entrypoint() {
-        loadStorage();
-        initRandomQueue();
-        changeBannerWisdom();
-        
-        document.querySelectorAll(".tab").forEach(tab => {
-            tab.addEventListener("click", () => {
-                const targetMode = tab.getAttribute("data-mode");
-                if(targetMode) {
-                    if(document.getElementById("cardsContainer") === null) {
-                        listView.innerHTML = `<div id="cardsContainer"></div><div id="statusMessage" class="status-message"></div><footer>🙏 精进不懈 · 随喜赞叹</footer>`;
-                        window.cardsContainer = document.getElementById("cardsContainer");
-                        window.statusMessage = document.getElementById("statusMessage");
-                    }
-                    switchDisplayMode(targetMode);
+        // 点击右上角按钮的总控逻辑
+        function handleAdminButtonClick() {
+            if (isAdmin) {
+                // 如果已经解锁，大方调起文件选择
+                document.getElementById('file-input').click();
+            } else {
+                // 如果没解锁，在网页里滑出密码框
+                const zone = document.getElementById('pwd-zone');
+                if (zone.style.display === 'flex') {
+                    zone.style.display = 'none';
+                } else {
+                    zone.style.display = 'flex';
+                    document.getElementById('pwd-input').focus();
                 }
+            }
+        }
+
+        // 验证网页内嵌密码框里的密码
+        function checkWebPassword() {
+            const inputPwd = document.getElementById('pwd-input').value;
+            if (inputPwd === "666888") { // 你的专属口令
+                isAdmin = true;
+                localStorage.setItem('is_admin_user', 'true'); // 浏览器记住你
+                document.getElementById('pwd-zone').style.display = 'none'; // 隐藏密码框
+                updateButtonState();
+                renderCards(globalCards); // 浮现单页删除按钮
+                alert("管理权限已成功解锁！现在右上角已变为蓝色【导入TXT】按钮，再次点击它即可完美选书！");
+            } else {
+                alert("暗号错误。");
+                document.getElementById('pwd-input').value = '';
+            }
+        }
+
+        // 动态更新右上角状态
+        function updateButtonState() {
+            const btn = document.getElementById('action-btn');
+            if (isAdmin) {
+                btn.innerText = "导入TXT";
+                btn.classList.add('upload-ready'); 
+            } else {
+                btn.innerText = "验证管理";
+                btn.classList.remove('upload-ready');
+            }
+        }
+
+        function initSwiper() {
+            if(swiperInstance) swiperInstance.destroy(true, true);
+            swiperInstance = new Swiper('.swiper-container', {
+                direction: 'vertical',
+                loop: false,
+                resistanceRatio: 0.4
             });
-        });
+        }
 
-        document.getElementById("searchBtn").onclick = executeSearch;
-        document.getElementById("clearSearchBtn").onclick = () => switchDisplayMode("random");
+        // 读取文件并智能切片
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
 
-        switchDisplayMode("random");
-    }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const bookName = file.name.replace('.txt', '');
+                
+                let chunks = [];
+                let start = 0;
+                const chunkSize = 400; 
+                const textLength = text.length;
+                let cardCounter = 1;
 
-    window.onload = entrypoint;
-</script>
+                while (start < textLength) {
+                    let end = start + chunkSize;
+                    if (end < textLength) {
+                        const searchZone = text.substring(end, end + 120);
+                        const match = searchZone.match(/[。？！\n]/);
+                        if (match) end += match.index + 1;
+                    }
+                    
+                    const content = text.substring(start, end).trim();
+                    if (content.length > 10) {
+                        chunks.push({
+                            id: `card_${Date.now()}_${cardCounter}`, 
+                            book: bookName,
+                            content: content
+                        });
+                        cardCounter++;
+                    }
+                    start = end;
+                }
+
+                globalCards = globalCards.concat(chunks);
+                localStorage.setItem('all_book_cards', JSON.stringify(globalCards));
+                renderCards(globalCards);
+                alert(`《${bookName}》智能切片完成！已成功追加 ${chunks.length} 页卡片。`);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function renderCards(cardsArray) {
+            const wrapper = document.getElementById('card-wrapper');
+            wrapper.innerHTML = '';
+
+            if(cardsArray.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="swiper-slide">
+                        <div class="card">
+                            <div class="card-content">📭 目前暂无书卡。请先点击右上角按钮验证并导入。</div>
+                        </div>
+                    </div>`;
+                initSwiper();
+                return;
+            }
+
+            cardsArray.forEach(item => {
+                const slide = document.createElement('div');
+                slide.className = 'swiper-slide';
+                slide.innerHTML = `
+                    <div class="card">
+                        <button class="admin-delete-btn" style="display: ${isAdmin ? 'block' : 'none'}" onclick="deleteCard('${item.id}', event)">❌ 删除卡片</button>
+                        <div class="card-content">${item.content}</div>
+                        <div class="card-footer">
+                            <span class="card-meta"># ${item.book} (第 ${item.id.split('_').pop()} 页)</span>
+                            <button class="fav-btn" onclick="toggleFav('${item.id}', this)">★</button>
+                        </div>
+                    </div>
+                `;
+                wrapper.appendChild(slide);
+            });
+            initSwiper();
+        }
+
+        function deleteCard(id, event) {
+            event.stopPropagation();
+            if (!confirm("确定要删除这张知识卡片吗？")) return;
+            globalCards = globalCards.filter(card => card.id !== id);
+            localStorage.setItem('all_book_cards', JSON.stringify(globalCards));
+            renderCards(globalCards);
+        }
+
+        function searchCards() {
+            const query = document.getElementById('search-box').value.trim().toLowerCase();
+            if (!query) {
+                renderCards(globalCards);
+                return;
+            }
+            const filtered = globalCards.filter(card => card.content.toLowerCase().includes(query));
+            renderCards(filtered);
+        }
+
+        function toggleFav(id, btn) {
+            let favorites = JSON.parse(localStorage.getItem('my_fav_cards')) || [];
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(favId => favId !== id);
+                btn.classList.remove('active');
+            } else {
+                favorites.push(id);
+                btn.classList.add('active');
+            }
+            localStorage.setItem('my_fav_cards', JSON.stringify(favorites));
+        }
+    </script>
 </body>
 </html>
