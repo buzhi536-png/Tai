@@ -1,268 +1,946 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>简讯·实修卡片盒</title>
-    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>晨钟</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; background-color: #f4f3ef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
-        
-        /* 1. 开屏警策晨钟 */
-        #alert-bell { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; color: #ffffff; text-align: center; transition: opacity 0.5s ease; }
-        #bell-title { font-size: 14px; color: #aeaeae; letter-spacing: 4px; margin-bottom: 30px; }
-        #bell-content { font-size: 20px; line-height: 1.8; color: #f5f5f7; margin-bottom: 40px; font-weight: 300; }
-        #bell-btn { background: none; border: 1px solid #545456; color: #eaeaea; padding: 10px 30px; border-radius: 20px; font-size: 14px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        /* 2. 顶部工具栏 */
-        .header-bar { position: absolute; top: 0; left: 0; width: 100%; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 10; background: rgba(244,243,239,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid #e5e4df; }
-        .page-title { font-size: 16px; font-weight: 600; color: #33322e; margin-right: 10px; white-space: nowrap; }
-        .search-input { flex: 1; height: 36px; border-radius: 18px; border: 1px solid #d2d1cb; padding: 0 15px; font-size: 13px; background: #fff; outline: none; }
-        
-        /* 右上角多功能控制按钮 */
-        .admin-btn { background: #8e8d8a; border: none; padding: 7px 14px; border-radius: 16px; font-size: 12px; color: #fff; font-weight: 500; margin-left: 10px; white-space: nowrap; }
-        .upload-ready { background: #0071e3 !important; } 
-        #file-input { display: none; }
+```
+    body {
+        background: #f5f1e8;
+        color: #333;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", serif;
+        min-height: 100vh;
+        overflow: hidden;
+    }
 
-        /* 网页内嵌密码输入小区域（彻底解决iOS拦截） */
-        #pwd-zone { display: none; position: absolute; right: 15px; top: 65px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #e5e4df; z-index: 20; display: none; align-items: center; }
-        #pwd-input { width: 100px; height: 28px; border: 1px solid #d2d1cb; border-radius: 6px; padding: 0 8px; font-size: 12px; outline: none; margin-right: 8px; }
-        #pwd-submit { background: #333; color: #fff; border: none; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+    /* ===== 通用面板 ===== */
+    .panel {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #f5f1e8;
+        z-index: 100;
+        flex-direction: column;
+        padding: 24px 16px 16px;
+    }
+    .panel.open { display: flex; }
 
-        /* 3. 卡片流样式 */
-        .swiper-container { width: 100%; height: 100%; }
-        .swiper-slide { display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: 75px; }
-        
-        /* 宣纸感卡片设计 */
-        .card { background: #fdfcf7; width: 100%; height: 82%; max-width: 420px; border-radius: 20px; padding: 28px; box-shadow: 0 6px 20px rgba(51,50,46,0.06); display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0,0,0,0.03); position: relative; }
-        .card-content { font-size: 18px; line-height: 1.8; color: #2b2a27; text-align: justify; overflow-y: auto; }
-        
-        /* 删除按钮 */
-        .admin-delete-btn { position: absolute; top: 15px; right: 15px; background: rgba(255,59,48,0.1); color: #ff3b30; border: none; padding: 4px 10px; border-radius: 12px; font-size: 11px; display: none; cursor: pointer; }
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .panel-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #555;
+        letter-spacing: 0.1em;
+    }
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: #888;
+        font-family: inherit;
+    }
 
-        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f2f1eb; padding-top: 12px; margin-top: 12px; }
-        .card-meta { font-size: 11px; color: #8e8d8a; }
-        .fav-btn { background: none; border: none; font-size: 22px; color: #d2d1cb; cursor: pointer; }
-        .fav-btn.active { color: #ffb703; }
-    </style>
+    /* ===== 开屏警策 ===== */
+    #splash-screen {
+        position: fixed;
+        inset: 0;
+        background: #f5f1e8;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 30px;
+        text-align: center;
+        z-index: 999;
+    }
+    #quote-text {
+        font-size: 26px;
+        line-height: 2;
+        color: #222;
+        margin-bottom: 60px;
+        letter-spacing: 0.05em;
+    }
+    #enter-btn {
+        padding: 14px 36px;
+        border: none;
+        border-radius: 50px;
+        background: #3a3a3a;
+        color: #f5f1e8;
+        font-size: 15px;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    /* ===== 加载中 ===== */
+    #loading-screen {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #f5f1e8;
+        justify-content: center;
+        align-items: center;
+        z-index: 998;
+        font-size: 15px;
+        color: #aaa;
+        letter-spacing: 0.1em;
+    }
+    #loading-screen.show { display: flex; }
+
+    /* ===== 主界面 ===== */
+    #main-app {
+        display: none;
+        flex-direction: column;
+        height: 100vh;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px 16px 16px;
+    }
+
+    header {
+        margin-bottom: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    header h1 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #555;
+        letter-spacing: 0.1em;
+    }
+    .header-btns {
+        display: flex;
+        gap: 10px;
+    }
+    .icon-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+    }
+    #searchInput {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 50px;
+        border: none;
+        background: white;
+        font-size: 15px;
+        color: #333;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        font-family: inherit;
+        outline: none;
+    }
+    #searchInput::placeholder { color: #bbb; }
+
+    /* ===== 卡片 ===== */
+    #card-area {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+    #card-container {
+        position: absolute;
+        inset: 0;
+        background: white;
+        border-radius: 20px;
+        padding: 28px 24px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        display: flex;
+        flex-direction: column;
+        cursor: grab;
+        user-select: none;
+    }
+    #card-container:active { cursor: grabbing; }
+
+    .book-label {
+        color: #bbb;
+        font-size: 12px;
+        margin-bottom: 20px;
+        letter-spacing: 0.08em;
+    }
+    #card-content {
+        font-size: 20px;
+        line-height: 2;
+        white-space: pre-wrap;
+        color: #222;
+        flex: 1;
+        overflow-y: auto;
+    }
+    .card-bottom {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+    #starBtn {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        padding: 4px;
+        opacity: 0.4;
+        transition: opacity 0.2s, transform 0.2s;
+    }
+    #starBtn.active {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    #card-counter {
+        text-align: center;
+        font-size: 12px;
+        color: #ccc;
+        margin-top: 10px;
+    }
+
+    /* ===== 空状态 ===== */
+    #empty-state {
+        display: none;
+        position: absolute;
+        inset: 0;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 12px;
+        color: #ccc;
+        font-size: 15px;
+        text-align: center;
+        line-height: 2;
+    }
+    #empty-state.show { display: flex; }
+
+    /* ===== 底部按钮 ===== */
+    footer {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+    }
+    footer button {
+        flex: 1;
+        border: none;
+        border-radius: 14px;
+        padding: 14px 8px;
+        font-size: 14px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        cursor: pointer;
+        font-family: inherit;
+        color: #555;
+        letter-spacing: 0.05em;
+    }
+    footer button:active { background: #eee; }
+
+    /* ===== 收藏夹 ===== */
+    #fav-list, #search-list {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .fav-card, .search-card {
+        background: white;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .search-card { cursor: pointer; }
+    .search-card:active { background: #f9f9f9; }
+
+    .fav-card .book-label,
+    .search-card .book-label { margin-bottom: 10px; }
+
+    .fav-content, .search-content {
+        font-size: 17px;
+        line-height: 1.9;
+        color: #222;
+    }
+    .fav-remove {
+        margin-top: 12px;
+        background: none;
+        border: none;
+        font-size: 12px;
+        color: #ccc;
+        cursor: pointer;
+        padding: 0;
+        font-family: inherit;
+    }
+    .empty-tip {
+        text-align: center;
+        color: #ccc;
+        margin-top: 80px;
+        font-size: 15px;
+        line-height: 2;
+    }
+
+    /* ===== 管理员面板 ===== */
+    #admin-panel .panel-header { margin-bottom: 24px; }
+
+    .admin-section {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .admin-section h3 {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 14px;
+        letter-spacing: 0.05em;
+    }
+
+    .upload-area {
+        border: 2px dashed #ddd;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        color: #bbb;
+        font-size: 14px;
+        line-height: 2;
+        cursor: pointer;
+        margin-bottom: 14px;
+    }
+    .upload-area:active { background: #f9f9f9; }
+
+    #file-input { display: none; }
+
+    .admin-input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background: #fafafa;
+        font-size: 14px;
+        font-family: inherit;
+        color: #333;
+        outline: none;
+        margin-bottom: 10px;
+    }
+
+    .admin-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .admin-row label {
+        font-size: 13px;
+        color: #888;
+        white-space: nowrap;
+    }
+    .admin-row input {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        background: #fafafa;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: #3a3a3a;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        font-family: inherit;
+        letter-spacing: 0.05em;
+    }
+    .btn-primary:active { background: #222; }
+    .btn-primary:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    #upload-log {
+        margin-top: 14px;
+        font-size: 13px;
+        color: #888;
+        line-height: 1.8;
+        max-height: 120px;
+        overflow-y: auto;
+    }
+    .log-ok { color: #4caf50; }
+    .log-err { color: #e57373; }
+
+    @media (max-width: 600px) {
+        #card-content { font-size: 18px; }
+        #quote-text { font-size: 22px; }
+    }
+</style>
+```
+
 </head>
 <body>
 
-    <div id="alert-bell">
-        <div id="bell-title">🔔 暮鼓晨钟 · 警策精进</div>
-        <div id="bell-content">正在收摄心神...</div>
-        <button id="bell-btn" onclick="closeBell()">进入静读</button>
-    </div>
+<!-- 开屏 -->
 
-    <div class="header-bar">
-        <div class="page-title">简讯盒</div>
-        <input type="text" class="search-input" id="search-box" placeholder="🔍 输入困惑从资料中检索..." oninput="searchCards()">
-        
-        <button class="admin-btn" id="action-btn" onclick="handleAdminButtonClick()">验证管理</button>
-        <input type="file" id="file-input" accept=".txt" onchange="handleFileUpload(this)">
-    </div>
+<div id="splash-screen">
+    <div id="quote-text">是日已过，命亦随减。</div>
+    <button id="enter-btn">进入阅读</button>
+</div>
 
-    <div id="pwd-zone">
-        <input type="password" id="pwd-input" placeholder="输入密码">
-        <button id="pwd-submit" onclick="checkWebPassword()">确定</button>
-    </div>
+<!-- 加载中 -->
 
-    <div class="swiper-container">
-        <div class="swiper-wrapper" id="card-wrapper">
-            <div class="swiper-slide">
-                <div class="card">
-                    <div class="card-content">✨ 欢迎来到你的专属卡片盒。目前尚未加载书籍。如果你是创建者，请点击右上角【验证管理】输入密码，解锁后即可导入书籍；普通用户请直接上下滑动。</div>
-                    <div class="card-footer"><span class="card-meta"># 系统引导</span><button class="fav-btn">★</button></div>
-                </div>
+<div id="loading-screen">正在加载…</div>
+
+<!-- 主界面 -->
+
+<div id="main-app">
+    <header>
+        <div class="header-top">
+            <h1>晨钟</h1>
+            <div class="header-btns">
+                <button class="icon-btn" id="favBtn" title="收藏夹">☆</button>
+                <button class="icon-btn" id="adminBtn" title="管理">⚙️</button>
             </div>
         </div>
+        <input type="text" id="searchInput" placeholder="搜索关键词…">
+    </header>
+
+```
+<div id="card-area">
+    <div id="card-container">
+        <div class="book-label" id="bookLabel"></div>
+        <div id="card-content"></div>
+        <div class="card-bottom">
+            <button id="starBtn">☆</button>
+        </div>
+    </div>
+    <div id="empty-state">
+        数据库暂无卡片<br>请先在管理页上传书籍
+    </div>
+</div>
+
+<div id="card-counter"></div>
+
+<footer>
+    <button id="randomBtn">🎲 随机</button>
+    <button id="prevBtn">← 上一张</button>
+    <button id="nextBtn">→ 下一张</button>
+</footer>
+```
+
+</div>
+
+<!-- 收藏夹 -->
+
+<div id="fav-panel" class="panel">
+    <div class="panel-header">
+        <h2>收藏夹</h2>
+        <button class="close-btn" id="closeFavBtn">✕</button>
+    </div>
+    <div id="fav-list"></div>
+</div>
+
+<!-- 搜索结果 -->
+
+<div id="search-panel" class="panel">
+    <div class="panel-header">
+        <h2 id="search-title">搜索结果</h2>
+        <button class="close-btn" id="closeSearchBtn">✕</button>
+    </div>
+    <div id="search-list"></div>
+</div>
+
+<!-- 管理员面板 -->
+
+<div id="admin-panel" class="panel">
+    <div class="panel-header">
+        <h2>管理员</h2>
+        <button class="close-btn" id="closeAdminBtn">✕</button>
     </div>
 
-    <script src="https://fastly.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        const bellSayings = [
-            "是日已过，命亦随减。如少水鱼，斯有何乐？当勤精进，如救头燃。",
-            "生死事大，无常迅速。光阴可惜，时不待人。",
-            "莫把初心付流水，须知大道路途遥。珍惜当下，精进克期。"
-        ];
-        
-        let globalCards = JSON.parse(localStorage.getItem('all_book_cards')) || [];
-        let swiperInstance = null;
-        let isAdmin = localStorage.getItem('is_admin_user') === 'true'; 
+```
+<div style="flex:1; overflow-y:auto;">
 
-        // 初始化一闪而过的警句
-        document.getElementById('bell-content').innerText = bellSayings[Math.floor(Math.random() * bellSayings.length)];
+    <div class="admin-section">
+        <h3>上传书籍（TXT 文件）</h3>
 
-        function closeBell() {
-            document.getElementById('alert-bell').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('alert-bell').style.display = 'none';
-                updateButtonState(); 
-                renderCards(globalCards);
-            }, 500);
+        <div class="admin-row">
+            <label>书名</label>
+            <input type="text" id="bookNameInput" placeholder="例：了凡四训">
+        </div>
+
+        <div class="admin-row">
+            <label>每卡字数</label>
+            <input type="number" id="chunkSizeInput" value="150" min="50" max="500">
+        </div>
+
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+            点击选择 TXT 文件<br>
+            <span style="font-size:12px;">支持 UTF-8 编码的纯文本文件</span>
+        </div>
+        <input type="file" id="file-input" accept=".txt">
+
+        <button class="btn-primary" id="uploadBtn" disabled>上传到数据库</button>
+
+        <div id="upload-log"></div>
+    </div>
+
+    <div class="admin-section">
+        <h3>数据库状态</h3>
+        <div id="db-status" style="font-size:14px; color:#888; line-height:2;">
+            点击下方按钮查看
+        </div>
+        <button class="btn-primary" id="checkDbBtn" style="margin-top:12px;">查看卡片总数</button>
+    </div>
+
+</div>
+```
+
+</div>
+
+<script>
+// ===========================
+// 配置
+// ===========================
+const SUPABASE_URL = "https://tzgmkqqtjnwgacipenmz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_pboaiePYU0TUqudEkNJHPw_hZE94vXo";
+const TABLE = "cards";
+
+// ===========================
+// Supabase API 封装
+// ===========================
+async function dbSelect(params = "") {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}${params}`, {
+        headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
         }
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
 
-        // 点击右上角按钮的总控逻辑
-        function handleAdminButtonClick() {
-            if (isAdmin) {
-                // 如果已经解锁，大方调起文件选择
-                document.getElementById('file-input').click();
-            } else {
-                // 如果没解锁，在网页里滑出密码框
-                const zone = document.getElementById('pwd-zone');
-                if (zone.style.display === 'flex') {
-                    zone.style.display = 'none';
-                } else {
-                    zone.style.display = 'flex';
-                    document.getElementById('pwd-input').focus();
-                }
-            }
+async function dbInsertBatch(rows) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: "POST",
+        headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(rows)
+    });
+    if (!res.ok) throw new Error(await res.text());
+}
+
+async function dbCount() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=id`, {
+        headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Prefer": "count=exact",
+            "Range": "0-0"
         }
+    });
+    const range = res.headers.get("content-range") || "";
+    const match = range.match(/\/(\d+)/);
+    return match ? Number(match[1]) : 0;
+}
 
-        // 验证网页内嵌密码框里的密码
-        function checkWebPassword() {
-            const inputPwd = document.getElementById('pwd-input').value;
-            if (inputPwd === "666888") { // 你的专属口令
-                isAdmin = true;
-                localStorage.setItem('is_admin_user', 'true'); // 浏览器记住你
-                document.getElementById('pwd-zone').style.display = 'none'; // 隐藏密码框
-                updateButtonState();
-                renderCards(globalCards); // 浮现单页删除按钮
-                alert("管理权限已成功解锁！现在右上角已变为蓝色【导入TXT】按钮，再次点击它即可完美选书！");
-            } else {
-                alert("暗号错误。");
-                document.getElementById('pwd-input').value = '';
-            }
+// ===========================
+// 警句（本地）
+// ===========================
+const quotes = [
+    "是日已过，命亦随减。",
+    "生死事大，无常迅速。",
+    "莫待老来方学道。",
+    "但行好事，莫问前程。",
+    "命由我作，福自己求。",
+    "静坐常思己过，闲谈莫论人非。",
+    "一切有为法，如梦幻泡影。",
+    "过去心不可得，现在心不可得，未来心不可得。",
+    "学如逆水行舟，不进则退。",
+    "知行合一，事上磨练。",
+    "人若改过，自有吉祥。",
+    "凡事预则立，不预则废。"
+];
+
+// ===========================
+// 状态
+// ===========================
+let cards = [];
+let currentIndex = 0;
+
+// ===========================
+// 元素
+// ===========================
+const splashScreen  = document.getElementById("splash-screen");
+const loadingScreen = document.getElementById("loading-screen");
+const mainApp       = document.getElementById("main-app");
+const quoteText     = document.getElementById("quote-text");
+const enterBtn      = document.getElementById("enter-btn");
+const cardContainer = document.getElementById("card-container");
+const cardContent   = document.getElementById("card-content");
+const bookLabel     = document.getElementById("bookLabel");
+const cardCounter   = document.getElementById("card-counter");
+const emptyState    = document.getElementById("empty-state");
+const starBtn       = document.getElementById("starBtn");
+const randomBtn     = document.getElementById("randomBtn");
+const prevBtn       = document.getElementById("prevBtn");
+const nextBtn       = document.getElementById("nextBtn");
+const searchInput   = document.getElementById("searchInput");
+const favBtn        = document.getElementById("favBtn");
+const favPanel      = document.getElementById("fav-panel");
+const favList       = document.getElementById("fav-list");
+const closeFavBtn   = document.getElementById("closeFavBtn");
+const searchPanel   = document.getElementById("search-panel");
+const searchList    = document.getElementById("search-list");
+const searchTitle   = document.getElementById("search-title");
+const closeSearchBtn= document.getElementById("closeSearchBtn");
+const adminBtn      = document.getElementById("adminBtn");
+const adminPanel    = document.getElementById("admin-panel");
+const closeAdminBtn = document.getElementById("closeAdminBtn");
+
+// ===========================
+// 开屏警句
+// ===========================
+quoteText.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+// ===========================
+// 收藏：本地存储
+// ===========================
+function getFavs() {
+    try { return JSON.parse(localStorage.getItem("favorites") || "[]"); }
+    catch(e) { return []; }
+}
+function saveFavs(f) {
+    try { localStorage.setItem("favorites", JSON.stringify(f)); } catch(e) {}
+}
+function isFav(card) {
+    return getFavs().some(f => f.id === card.id);
+}
+
+// ===========================
+// 渲染卡片
+// ===========================
+function renderCard() {
+    if (cards.length === 0) {
+        cardContainer.style.display = "none";
+        emptyState.classList.add("show");
+        cardCounter.textContent = "";
+        return;
+    }
+
+    cardContainer.style.display = "flex";
+    emptyState.classList.remove("show");
+
+    if (currentIndex < 0) currentIndex = cards.length - 1;
+    if (currentIndex >= cards.length) currentIndex = 0;
+
+    const card = cards[currentIndex];
+    bookLabel.textContent = card.book || "";
+    cardContent.textContent = card.content || "";
+    cardCounter.textContent = (currentIndex + 1) + " / " + cards.length;
+
+    if (isFav(card)) {
+        starBtn.textContent = "★";
+        starBtn.classList.add("active");
+    } else {
+        starBtn.textContent = "☆";
+        starBtn.classList.remove("active");
+    }
+
+    try { localStorage.setItem("reading-progress", currentIndex); } catch(e) {}
+}
+
+// ===========================
+// 加载数据库卡片
+// ===========================
+async function loadCards() {
+    loadingScreen.classList.add("show");
+    try {
+        // 分批加载，每次1000条
+        let all = [];
+        let from = 0;
+        const batch = 1000;
+        while (true) {
+            const chunk = await dbSelect(`?select=id,book,content&order=id.asc&offset=${from}&limit=${batch}`);
+            all = all.concat(chunk);
+            if (chunk.length < batch) break;
+            from += batch;
         }
+        cards = all;
 
-        // 动态更新右上角状态
-        function updateButtonState() {
-            const btn = document.getElementById('action-btn');
-            if (isAdmin) {
-                btn.innerText = "导入TXT";
-                btn.classList.add('upload-ready'); 
-            } else {
-                btn.innerText = "验证管理";
-                btn.classList.remove('upload-ready');
-            }
-        }
+        // 恢复断点
+        try {
+            const saved = Number(localStorage.getItem("reading-progress") || 0);
+            if (saved >= 0 && saved < cards.length) currentIndex = saved;
+            else currentIndex = 0;
+        } catch(e) { currentIndex = 0; }
 
-        function initSwiper() {
-            if(swiperInstance) swiperInstance.destroy(true, true);
-            swiperInstance = new Swiper('.swiper-container', {
-                direction: 'vertical',
-                loop: false,
-                resistanceRatio: 0.4
+    } catch(e) {
+        cards = [];
+        console.error("加载失败", e);
+    }
+    loadingScreen.classList.remove("show");
+}
+
+// ===========================
+// 进入阅读
+// ===========================
+enterBtn.addEventListener("click", async () => {
+    splashScreen.style.display = "none";
+    mainApp.style.display = "flex";
+    await loadCards();
+    renderCard();
+});
+
+// ===========================
+// 翻页
+// ===========================
+nextBtn.addEventListener("click", () => { currentIndex++; renderCard(); });
+prevBtn.addEventListener("click", () => { currentIndex--; renderCard(); });
+randomBtn.addEventListener("click", () => {
+    if (cards.length === 0) return;
+    currentIndex = Math.floor(Math.random() * cards.length);
+    renderCard();
+});
+
+// ===========================
+// 滑动手势
+// ===========================
+let tx = 0, ty = 0;
+cardContainer.addEventListener("touchstart", e => {
+    tx = e.touches[0].clientX;
+    ty = e.touches[0].clientY;
+}, { passive: true });
+cardContainer.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > 40) { dx < 0 ? currentIndex++ : currentIndex--; renderCard(); }
+    } else {
+        if (Math.abs(dy) > 40) { dy < 0 ? currentIndex++ : currentIndex--; renderCard(); }
+    }
+}, { passive: true });
+
+// ===========================
+// 收藏
+// ===========================
+starBtn.addEventListener("click", () => {
+    if (cards.length === 0) return;
+    const card = cards[currentIndex];
+    let favs = getFavs();
+    if (isFav(card)) {
+        favs = favs.filter(f => f.id !== card.id);
+    } else {
+        favs.push(card);
+    }
+    saveFavs(favs);
+    renderCard();
+});
+
+favBtn.addEventListener("click", () => { renderFavPanel(); favPanel.classList.add("open"); });
+closeFavBtn.addEventListener("click", () => favPanel.classList.remove("open"));
+
+function renderFavPanel() {
+    const favs = getFavs();
+    favList.innerHTML = "";
+    if (favs.length === 0) {
+        favList.innerHTML = '<div class="empty-tip">还没有收藏<br>阅读时点击 ☆ 收藏卡片</div>';
+        return;
+    }
+    favs.forEach(card => {
+        const div = document.createElement("div");
+        div.className = "fav-card";
+        div.innerHTML = `
+            <div class="book-label">${card.book || ""}</div>
+            <div class="fav-content">${card.content || ""}</div>
+            <button class="fav-remove" data-id="${card.id}">移除收藏</button>
+        `;
+        favList.appendChild(div);
+    });
+    favList.querySelectorAll(".fav-remove").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = Number(btn.dataset.id);
+            saveFavs(getFavs().filter(f => f.id !== id));
+            renderFavPanel();
+            renderCard();
+        });
+    });
+}
+
+// ===========================
+// 搜索
+// ===========================
+searchInput.addEventListener("input", () => {
+    const kw = searchInput.value.trim();
+    if (!kw) { searchPanel.classList.remove("open"); return; }
+
+    const results = cards.filter(c =>
+        c.content.includes(kw) || (c.book && c.book.includes(kw))
+    );
+    searchTitle.textContent = `"${kw}"  ·  ${results.length} 条`;
+    searchList.innerHTML = "";
+
+    if (results.length === 0) {
+        searchList.innerHTML = '<div class="empty-tip">未找到相关内容</div>';
+    } else {
+        results.forEach(card => {
+            const div = document.createElement("div");
+            div.className = "search-card";
+            div.innerHTML = `
+                <div class="book-label">${card.book || ""}</div>
+                <div class="search-content">${card.content || ""}</div>
+            `;
+            div.addEventListener("click", () => {
+                currentIndex = cards.findIndex(c => c.id === card.id);
+                renderCard();
+                searchPanel.classList.remove("open");
+                searchInput.value = "";
             });
-        }
+            searchList.appendChild(div);
+        });
+    }
+    searchPanel.classList.add("open");
+});
+closeSearchBtn.addEventListener("click", () => {
+    searchPanel.classList.remove("open");
+    searchInput.value = "";
+});
 
-        // 读取文件并智能切片
-        function handleFileUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
+// ===========================
+// 管理员面板
+// ===========================
+adminBtn.addEventListener("click", () => adminPanel.classList.add("open"));
+closeAdminBtn.addEventListener("click", () => adminPanel.classList.remove("open"));
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const bookName = file.name.replace('.txt', '');
-                
-                let chunks = [];
-                let start = 0;
-                const chunkSize = 400; 
-                const textLength = text.length;
-                let cardCounter = 1;
+// 文件选择
+const fileInput     = document.getElementById("file-input");
+const uploadArea    = document.getElementById("upload-area");
+const bookNameInput = document.getElementById("bookNameInput");
+const chunkSizeInput= document.getElementById("chunkSizeInput");
+const uploadBtn     = document.getElementById("uploadBtn");
+const uploadLog     = document.getElementById("upload-log");
+const checkDbBtn    = document.getElementById("checkDbBtn");
+const dbStatus      = document.getElementById("db-status");
 
-                while (start < textLength) {
-                    let end = start + chunkSize;
-                    if (end < textLength) {
-                        const searchZone = text.substring(end, end + 120);
-                        const match = searchZone.match(/[。？！\n]/);
-                        if (match) end += match.index + 1;
-                    }
-                    
-                    const content = text.substring(start, end).trim();
-                    if (content.length > 10) {
-                        chunks.push({
-                            id: `card_${Date.now()}_${cardCounter}`, 
-                            book: bookName,
-                            content: content
-                        });
-                        cardCounter++;
-                    }
-                    start = end;
-                }
+let selectedFile = null;
 
-                globalCards = globalCards.concat(chunks);
-                localStorage.setItem('all_book_cards', JSON.stringify(globalCards));
-                renderCards(globalCards);
-                alert(`《${bookName}》智能切片完成！已成功追加 ${chunks.length} 页卡片。`);
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
+fileInput.addEventListener("change", () => {
+    selectedFile = fileInput.files[0];
+    if (selectedFile) {
+        uploadArea.innerHTML = `✅ 已选择：${selectedFile.name}<br><span style="font-size:12px;color:#bbb">点击重新选择</span>`;
+        uploadBtn.disabled = false;
+    }
+});
 
-        function renderCards(cardsArray) {
-            const wrapper = document.getElementById('card-wrapper');
-            wrapper.innerHTML = '';
+// 切分文本：按段落切，段落太长再按字数切
+function splitText(text, chunkSize) {
+    const paras = text.split(/\n+/).map(p => p.trim()).filter(p => p.length > 0);
+    const chunks = [];
+    let current = "";
 
-            if(cardsArray.length === 0) {
-                wrapper.innerHTML = `
-                    <div class="swiper-slide">
-                        <div class="card">
-                            <div class="card-content">📭 目前暂无书卡。请先点击右上角按钮验证并导入。</div>
-                        </div>
-                    </div>`;
-                initSwiper();
-                return;
+    for (const para of paras) {
+        if (para.length >= chunkSize) {
+            // 段落本身就超长，直接按字数切
+            if (current.trim()) { chunks.push(current.trim()); current = ""; }
+            for (let i = 0; i < para.length; i += chunkSize) {
+                chunks.push(para.slice(i, i + chunkSize));
             }
-
-            cardsArray.forEach(item => {
-                const slide = document.createElement('div');
-                slide.className = 'swiper-slide';
-                slide.innerHTML = `
-                    <div class="card">
-                        <button class="admin-delete-btn" style="display: ${isAdmin ? 'block' : 'none'}" onclick="deleteCard('${item.id}', event)">❌ 删除卡片</button>
-                        <div class="card-content">${item.content}</div>
-                        <div class="card-footer">
-                            <span class="card-meta"># ${item.book} (第 ${item.id.split('_').pop()} 页)</span>
-                            <button class="fav-btn" onclick="toggleFav('${item.id}', this)">★</button>
-                        </div>
-                    </div>
-                `;
-                wrapper.appendChild(slide);
-            });
-            initSwiper();
+        } else if ((current + "\n" + para).length > chunkSize) {
+            if (current.trim()) chunks.push(current.trim());
+            current = para;
+        } else {
+            current = current ? current + "\n" + para : para;
         }
+    }
+    if (current.trim()) chunks.push(current.trim());
+    return chunks;
+}
 
-        function deleteCard(id, event) {
-            event.stopPropagation();
-            if (!confirm("确定要删除这张知识卡片吗？")) return;
-            globalCards = globalCards.filter(card => card.id !== id);
-            localStorage.setItem('all_book_cards', JSON.stringify(globalCards));
-            renderCards(globalCards);
-        }
+function log(msg, type = "") {
+    const div = document.createElement("div");
+    div.className = type;
+    div.textContent = msg;
+    uploadLog.appendChild(div);
+    uploadLog.scrollTop = uploadLog.scrollHeight;
+}
 
-        function searchCards() {
-            const query = document.getElementById('search-box').value.trim().toLowerCase();
-            if (!query) {
-                renderCards(globalCards);
-                return;
-            }
-            const filtered = globalCards.filter(card => card.content.toLowerCase().includes(query));
-            renderCards(filtered);
-        }
+uploadBtn.addEventListener("click", async () => {
+    if (!selectedFile) return;
 
-        function toggleFav(id, btn) {
-            let favorites = JSON.parse(localStorage.getItem('my_fav_cards')) || [];
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(favId => favId !== id);
-                btn.classList.remove('active');
-            } else {
-                favorites.push(id);
-                btn.classList.add('active');
-            }
-            localStorage.setItem('my_fav_cards', JSON.stringify(favorites));
+    const bookName = bookNameInput.value.trim();
+    if (!bookName) { alert("请先填写书名"); return; }
+
+    const chunkSize = Math.max(50, Math.min(500, Number(chunkSizeInput.value) || 150));
+
+    uploadBtn.disabled = true;
+    uploadLog.innerHTML = "";
+    log("正在读取文件…");
+
+    const text = await selectedFile.text();
+    const chunks = splitText(text, chunkSize);
+    log(`共切出 ${chunks.length} 张卡片，开始上传…`);
+
+    const batchSize = 100;
+    let success = 0;
+
+    for (let i = 0; i < chunks.length; i += batchSize) {
+        const batch = chunks.slice(i, i + batchSize).map(content => ({
+            book: bookName,
+            content: content
+        }));
+        try {
+            await dbInsertBatch(batch);
+            success += batch.length;
+            log(`已上传 ${success} / ${chunks.length} 张…`);
+        } catch(e) {
+            log(`上传出错（第${i}批）：${e.message}`, "log-err");
         }
-    </script>
+    }
+
+    log(`✅ 完成！共上传 ${success} 张卡片`, "log-ok");
+    uploadBtn.disabled = false;
+
+    // 重新加载卡片
+    await loadCards();
+    renderCard();
+});
+
+// 查看数量
+checkDbBtn.addEventListener("click", async () => {
+    dbStatus.textContent = "查询中…";
+    try {
+        const count = await dbCount();
+        dbStatus.textContent = `数据库当前共有 ${count} 张卡片`;
+    } catch(e) {
+        dbStatus.textContent = "查询失败：" + e.message;
+    }
+});
+
+</script>
+
 </body>
 </html>
